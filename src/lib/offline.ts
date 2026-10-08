@@ -66,7 +66,7 @@ export async function saveAllSurahs(lang: Lang, reciter: string, onProgress: (do
       const s = queue.shift()!;
       const url = surahUrl(s, lang, reciter);
       if (!(await c.match(url))) {
-        const res = await fetch(url, { signal });
+        const res = await fetch(url, { signal: signal ?? null });
         if (!res.ok) throw new Error("network");
         await c.put(url, res);
       }
