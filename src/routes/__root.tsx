@@ -38,10 +38,31 @@ function NotFoundComponent() {
   );
 }
 
+const CHUNK_ERROR = /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i;
+
+function reloadOnceForStaleChunk() {
+  if (typeof window === "undefined") return false;
+  const key = "cpf-chunk-reload";
+  const last = Number(sessionStorage.getItem(key) || 0);
+  if (Date.now() - last < 10000) return false;
+  sessionStorage.setItem(key, String(Date.now()));
+  window.location.reload();
+  return true;
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("vite:preloadError", (e) => {
+    e.preventDefault();
+    reloadOnceForStaleChunk();
+  });
+}
+
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (CHUNK_ERROR.test(msg) && reloadOnceForStaleChunk()) return;
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
