@@ -4,6 +4,7 @@
 - [x] 06 Audio (core): reciters, play/next/prev, speed, repeat ayah/surah, mini-player
 - [x] 08 FR/EN/AR + RTL (core)
 - [x] 09 Search, history, favorites, bookmarks, progress, local stats
+- [ ] Current request: surah downloads, colored favorite/download icons, playlist, next-surah playback, favorite reciters, normalized Arabic search
 - [ ] 06 Audio downloads for offline
 - [x] 07 Offline / installable app (PWA): offline banner, install button, save all 114 surahs
 - [ ] 10 Licensed reciter photos (needs licensed images)
