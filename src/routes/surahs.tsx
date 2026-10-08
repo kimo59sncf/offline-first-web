@@ -7,6 +7,8 @@ import { PageHeader, SurahRow } from "@/components/AppShell";
 export const Route = createFileRoute("/surahs")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Les 114 sourates — CoranProFree" },
       { name: "description", content: "Liste complète des 114 sourates du Coran avec nom arabe, translittération et nombre de versets." },
       { property: "og:title", content: "Les 114 sourates — CoranProFree" },

@@ -13,6 +13,8 @@ import { PageHeader } from "@/components/AppShell";
 export const Route = createFileRoute("/favorites")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Mes favoris — CoranProFree" },
       { name: "description", content: "Vos versets favoris et marque-pages, enregistrés sur votre appareil." },
       { property: "og:title", content: "Mes favoris — CoranProFree" },

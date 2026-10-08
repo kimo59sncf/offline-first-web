@@ -19,7 +19,7 @@ export const Route = createFileRoute("/surah/$id")({
     const s = SURAHS[Number(params.id) - 1];
     const title = s ? `Sourate ${s.tr} (${s.ar}) — CoranProFree` : "CoranProFree";
     const desc = s ? `Lire et écouter la sourate ${s.tr} — ${s.en}, ${s.ayahs} versets.` : "";
-    return { meta: [{ title }, { name: "description", content: desc }, { property: "og:title", content: title }, { property: "og:description", content: desc }] };
+    return { meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title }, { name: "description", content: desc }, { property: "og:title", content: title }, { property: "og:description", content: desc }] };
   },
   component: Reader,
 });

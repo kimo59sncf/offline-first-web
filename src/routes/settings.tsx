@@ -10,6 +10,8 @@ import { ReciterPicker } from "@/components/LibraryControls";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Réglages — CoranProFree" },
       { name: "description", content: "Langue, récitateur, taille du texte et sources de CoranProFree." },
       { property: "og:title", content: "Réglages — CoranProFree" },
