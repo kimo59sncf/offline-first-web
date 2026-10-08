@@ -4,7 +4,7 @@ import { BookOpen, Heart, Home, Pause, Play, Search, Settings, SkipBack, SkipFor
 import { Button } from "@/components/ui/button";
 import { SurahActions } from "@/components/LibraryControls";
 import { useT, type TKey } from "@/lib/i18n";
-import { usePlayer } from "@/lib/player";
+import { usePlayer } from "@/lib/player-context";
 import { surah } from "@/lib/quran";
 import { useOnline } from "@/lib/offline";
 

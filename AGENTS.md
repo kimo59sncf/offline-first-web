@@ -15,3 +15,4 @@
 - Download status is derived from verified metadata and every audio file in the shared Cache API cache, never from favorites. Why: incomplete downloads and browser eviction must not display false saved states.
 - Cached audio is played through revocable blob URLs with request ordering guards. Why: offline playback must work without a service worker and avoid media range-request failures or stale async playback.
 - The playback continuation rule lives in a browser-safe pure module; playlist order takes precedence over numeric surah progression. Why: keep next-surah behavior consistent and independently testable.
+- Keep the player context and hook in a non-component module, with the provider exporting only its component. Why: Fast Refresh must not replace the context identity independently of mounted consumers.

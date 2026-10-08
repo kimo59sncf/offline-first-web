@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LANGS, useT } from "@/lib/i18n";
 import { defaultState, setState, useStore } from "@/lib/store";
 import { RECITERS, TRANSLATIONS } from "@/lib/quran";
-import { usePlayer } from "@/lib/player";
+import { usePlayer } from "@/lib/player-context";
 import { PageHeader } from "@/components/AppShell";
 import { OfflineSection } from "@/components/OfflineSection";
 import { ReciterPicker } from "@/components/LibraryControls";

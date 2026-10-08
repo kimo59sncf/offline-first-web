@@ -1,25 +1,8 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getState, setState } from "./store";
 import { cachedAudioUrl, surahTracks } from "./downloads";
 import { followingSurah } from "./playback";
-
-type Track = { s: number; a: number; url: string };
-type Repeat = "off" | "ayah" | "surah";
-type Ctx = {
-  queue: Track[]; index: number; playing: boolean; error: boolean;
-  speed: number; repeat: Repeat; progress: number;
-  playQueue: (q: Track[], start: number) => void;
-  toggle: () => void; next: () => void; prev: () => void;
-  nextSurah: () => void;
-  playSurah: (n: number) => Promise<void>;
-  setSpeed: (n: number) => void; setRepeat: (r: Repeat) => void; stop: () => void;
-};
-const PlayerCtx = createContext<Ctx | null>(null);
-export const usePlayer = () => {
-  const context = useContext(PlayerCtx);
-  if (!context) throw new Error("PlayerProvider required");
-  return context;
-};
+import { PlayerCtx, type PlayerContextValue, type Track, type Repeat } from "./player-context";
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -90,7 +73,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     } catch { if (id === request.current) { setError(true); setPlaying(false); } }
   }
 
-  const value: Ctx = {
+  const value: PlayerContextValue = {
     queue, index, playing, error, speed, repeat, progress,
     playSurah,
     nextSurah: () => {

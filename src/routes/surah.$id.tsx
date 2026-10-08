@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useT } from "@/lib/i18n";
 import { setState, toggleIn, useStore } from "@/lib/store";
 import { surahQuery, SURAHS, surah, type Ayah } from "@/lib/quran";
-import { usePlayer } from "@/lib/player";
+import { usePlayer } from "@/lib/player-context";
 import { Button } from "@/components/ui/button";
 import { SurahActions, ReciterPicker } from "@/components/LibraryControls";
 

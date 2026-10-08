@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SurahRow } from "@/components/AppShell";
 import { ReciterPicker } from "@/components/LibraryControls";
 import { useDownloadedSurahs } from "@/lib/downloads";
-import { usePlayer } from "@/lib/player";
+import { usePlayer } from "@/lib/player-context";
 import { useT } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { SURAHS, surah } from "@/lib/quran";
