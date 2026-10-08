@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useT } from "@/lib/i18n";
-import { SURAHS, surah } from "@/lib/quran";
+import { SURAHS, normalize } from "@/lib/quran";
 import { PageHeader, SurahRow } from "@/components/AppShell";
 
 export const Route = createFileRoute("/surahs")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Les 114 sourates — CoranProFree" },
       { name: "description", content: "Liste complète des 114 sourates du Coran avec nom arabe, translittération et nombre de versets." },
       { property: "og:title", content: "Les 114 sourates — CoranProFree" },
@@ -19,8 +21,8 @@ export const Route = createFileRoute("/surahs")({
 function Surahs() {
   const { t } = useT();
   const [q, setQ] = useState("");
-  const f = q.trim().toLowerCase();
-  const list = SURAHS.filter((s) => !f || String(s.n) === f || s.tr.toLowerCase().includes(f) || s.en.toLowerCase().includes(f) || s.ar.includes(q.trim()));
+  const f = normalize(q.trim());
+  const list = SURAHS.filter((s) => !f || String(s.n) === f || normalize(`${s.tr} ${s.en} ${s.ar}`).includes(f));
   return (
     <div>
       <PageHeader title={t("surahs")}>

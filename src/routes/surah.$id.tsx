@@ -6,7 +6,9 @@ import { toast } from "sonner";
 import { useT } from "@/lib/i18n";
 import { setState, toggleIn, useStore } from "@/lib/store";
 import { surahQuery, SURAHS, surah, type Ayah } from "@/lib/quran";
-import { usePlayer } from "@/lib/player";
+import { usePlayer } from "@/lib/player-context";
+import { Button } from "@/components/ui/button";
+import { SurahActions, ReciterPicker } from "@/components/LibraryControls";
 
 export const Route = createFileRoute("/surah/$id")({
   beforeLoad: ({ params }) => {
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/surah/$id")({
     const s = SURAHS[Number(params.id) - 1];
     const title = s ? `Sourate ${s.tr} (${s.ar}) — CoranProFree` : "CoranProFree";
     const desc = s ? `Lire et écouter la sourate ${s.tr} — ${s.en}, ${s.ayahs} versets.` : "";
-    return { meta: [{ title }, { name: "description", content: desc }, { property: "og:title", content: title }, { property: "og:description", content: desc }] };
+    return { meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title }, { name: "description", content: desc }, { property: "og:title", content: title }, { property: "og:description", content: desc }] };
   },
   component: Reader,
 });
@@ -45,7 +47,9 @@ function Reader() {
   }, [q.data]);
 
   const play = (i: number) => q.data && p.playQueue(q.data.map((a) => ({ s: n, a: a.n, url: a.audio })), i);
-  const current = p.queue[p.index]?.s === n ? p.queue[p.index]!.a : null;
+  const track = p.queue[p.index];
+  const current = track?.s === n ? track.a : null;
+  const autoAdvance = useStore((x) => x.autoAdvance);
 
   return (
     <div>
@@ -62,6 +66,24 @@ function Reader() {
           <Play className="h-4 w-4" /> {t("playSurah")}
         </button>
       </header>
+
+      <section className="space-y-3 px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <SurahActions n={n} />
+          <Button variant="outline" disabled={n === 114} onClick={() => p.playSurah(n + 1)}><ChevronRight className="rtl:rotate-180" />{t("nextSurah")}</Button>
+        </div>
+        <details>
+          <summary className="cursor-pointer font-medium text-primary">{t("reciter")}</summary>
+          <div className="pt-3"><ReciterPicker /></div>
+        </details>
+        <label className="flex items-center justify-between gap-4 text-sm">
+          <span>{t("autoAdvance")}</span><input type="checkbox" checked={autoAdvance} onChange={(e) => setState(() => ({ autoAdvance: e.target.checked }))} className="h-5 w-5 accent-primary" />
+        </label>
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <label className="flex items-center gap-2">{t("speed")}<select aria-label={t("speed")} value={p.speed} onChange={(e) => p.setSpeed(Number(e.target.value))} className="rounded-md border bg-card p-2">{[0.5, 0.75, 1, 1.25, 1.5, 2].map((v) => <option key={v} value={v}>{num(v)}×</option>)}</select></label>
+          <label className="flex items-center gap-2">{t("repeat")}<select aria-label={t("repeat")} value={p.repeat} onChange={(e) => p.setRepeat(e.target.value as "off" | "ayah" | "surah")} className="rounded-md border bg-card p-2">{(["off", "ayah", "surah"] as const).map((r) => <option key={r} value={r}>{t(r === "off" ? "repeatOff" : r === "ayah" ? "repeatAyah" : "repeatSurah")}</option>)}</select></label>
+        </div>
+      </section>
 
       {n !== 1 && n !== 9 && <p dir="rtl" className="font-quran py-4 text-center text-3xl text-primary">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>}
 

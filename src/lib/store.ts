@@ -8,6 +8,10 @@ export type AppState = {
   showTranslation: boolean;
   fontSize: number;
   favorites: string[]; // "surah:ayah"
+  favoriteSurahs: number[];
+  favoriteReciters: string[];
+  playlist: number[];
+  autoAdvance: boolean;
   bookmarks: string[];
   lastRead: { s: number; a: number } | null;
   lastListen: { s: number; a: number } | null;
@@ -23,6 +27,10 @@ export const defaultState: AppState = {
   showTranslation: true,
   fontSize: 30,
   favorites: [],
+  favoriteSurahs: [],
+  favoriteReciters: [],
+  playlist: [],
+  autoAdvance: true,
   bookmarks: [],
   lastRead: null,
   lastListen: null,
@@ -72,3 +80,8 @@ export function useStore<T>(sel: (s: AppState) => T): T {
 
 export const toggleIn = (list: string[], k: string) =>
   list.includes(k) ? list.filter((x) => x !== k) : [...list, k];
+
+export const toggleSurah = (list: number[], n: number) =>
+  list.includes(n) ? list.filter((x) => x !== n) : [...list, n];
+
+export const getState = () => { load(); return state; };

@@ -5,6 +5,7 @@ import { useT } from "@/lib/i18n";
 import { setState, useStore } from "@/lib/store";
 import { RECITERS, SURAHS, surah } from "@/lib/quran";
 import { SurahRow } from "@/components/AppShell";
+import { ReciterPicker } from "@/components/LibraryControls";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -58,19 +59,7 @@ function Home() {
       )}
 
       <h2 className="px-6 pb-2 pt-8 text-2xl font-semibold">{t("reciters")}</h2>
-      <div className="flex gap-3 overflow-x-auto px-5 pb-2">
-        {RECITERS.map((r) => {
-          const on = reciter === r.id;
-          return (
-            <button key={r.id} type="button" aria-pressed={on} onClick={() => setState(() => ({ reciter: r.id }))} className="w-28 shrink-0 text-center">
-              <div className={`mx-auto grid h-16 w-16 place-items-center rounded-full font-display text-xl font-semibold transition-colors ${on ? "bg-primary text-primary-foreground ring-2 ring-gold ring-offset-2 ring-offset-background" : "bg-accent text-accent-foreground"}`}>
-                {r.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-              </div>
-              <div className={`mt-2 text-xs leading-tight ${on ? "font-semibold text-primary" : "font-medium"}`}>{lang === "ar" ? r.ar : r.name}</div>
-            </button>
-          );
-        })}
-      </div>
+      <div className="px-5 pb-2"><ReciterPicker /></div>
 
       <div className="flex items-end justify-between px-6 pb-2 pt-8">
         <h2 className="text-2xl font-semibold">{t("surahs")}</h2>

@@ -63,15 +63,17 @@ const isArabic = (q: string) => /[\u0600-\u06FF]/.test(q);
 // Diacritic/letter-form insensitive normalisation (Arabic + Latin accents).
 export const normalize = (t: string) =>
   t
-    .normalize("NFD")
+    .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, "")
     .replace(/[أإآٱ]/g, "ا")
+    .replace(/[۰-۹٠-٩]/g, (c) => String(c.charCodeAt(0) - (c >= "۰" ? 0x6f0 : 0x660)))
     .replace(/ى/g, "ي")
     .replace(/ة/g, "ه")
     .replace(/ؤ/g, "و")
     .replace(/ئ/g, "ي")
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/\s+/g, " ");
 
 type Indexed = { s: number; a: number; text: string; norm: string };
 export const editionQuery = (ed: string) =>
@@ -90,7 +92,7 @@ export const editionQuery = (ed: string) =>
   });
 
 export const searchEdition = (q: string, lang: Lang) =>
-  isArabic(q) ? "quran-simple-clean" : TRANSLATIONS[lang]?.id ?? TRANSLATIONS.fr!.id;
+  isArabic(q) ? "quran-simple-clean" : TRANSLATIONS[lang]?.id ?? "fr.hamidullah";
 
 export function runSearch(index: Indexed[], q: string): SearchHit[] {
   const n = normalize(q.trim());
@@ -103,4 +105,8 @@ export function runSearch(index: Indexed[], q: string): SearchHit[] {
 }
 
 export const surahName = (s: Surah, lang: Lang) => (lang === "ar" ? s.ar : s.tr);
-export const surah = (n: number): Surah => SURAHS[Math.min(Math.max(n, 1), 114) - 1]!;
+export const surah = (n: number): Surah => {
+  const s = SURAHS[Math.min(Math.max(n, 1), 114) - 1];
+  if (!s) throw new Error("Invalid surah");
+  return s;
+};

@@ -9,6 +9,8 @@ import { PageHeader } from "@/components/AppShell";
 export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Recherche dans le Coran — CoranProFree" },
       { name: "description", content: "Recherchez un mot dans la traduction du Coran." },
       { property: "og:title", content: "Recherche — CoranProFree" },

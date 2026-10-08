@@ -63,7 +63,8 @@ export async function saveAllSurahs(lang: Lang, reciter: string, onProgress: (do
   const queue = Array.from({ length: 114 }, (_, i) => i + 1);
   const worker = async () => {
     while (queue.length && !signal?.aborted) {
-      const s = queue.shift()!;
+      const s = queue.shift();
+      if (!s) return;
       const url = surahUrl(s, lang, reciter);
       if (!(await c.match(url))) {
         const res = await fetch(url, { signal: signal ?? null });
@@ -78,6 +79,7 @@ export async function saveAllSurahs(lang: Lang, reciter: string, onProgress: (do
 
 export async function clearSavedData() {
   if (offlineSupported()) await caches.delete(DATA_CACHE);
+  window.dispatchEvent(new Event("cpf-cache-change"));
 }
 
 export const hasTranslation = (lang: Lang) => !!TRANSLATIONS[lang];
