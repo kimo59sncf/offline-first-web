@@ -3,7 +3,8 @@ import { useEffect, type ReactNode } from "react";
 import { BookOpen, Heart, Home, Pause, Play, Search, Settings, SkipBack, SkipForward, X, RotateCw } from "lucide-react";
 import { useT, type TKey } from "@/lib/i18n";
 import { usePlayer } from "@/lib/player";
-import { SURAHS, surah } from "@/lib/quran";
+import { surah } from "@/lib/quran";
+import { useOnline } from "@/lib/offline";
 
 const tabs: { to: "/" | "/surahs" | "/search" | "/favorites" | "/settings"; icon: typeof Home; k: TKey }[] = [
   { to: "/", icon: Home, k: "home" },
@@ -30,8 +31,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
     navigator.serviceWorker.register("/sw.js").catch(() => {});
   }, []);
+  const online = useOnline();
   return (
     <div className="mx-auto min-h-screen max-w-3xl pb-40">
+      {!online && (
+        <div role="status" className="sticky top-0 z-40 bg-gold px-4 py-2 text-center text-xs font-medium text-foreground">
+          {t("offlineBanner")}
+        </div>
+      )}
       {children}
       <MiniPlayer />
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 backdrop-blur">

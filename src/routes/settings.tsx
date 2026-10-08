@@ -4,6 +4,7 @@ import { defaultState, setState, useStore } from "@/lib/store";
 import { RECITERS, TRANSLATIONS } from "@/lib/quran";
 import { usePlayer } from "@/lib/player";
 import { PageHeader } from "@/components/AppShell";
+import { OfflineSection } from "@/components/OfflineSection";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -49,6 +50,7 @@ function SettingsPage() {
             <input type="checkbox" checked={st.showTranslation} onChange={(e) => setState(() => ({ showTranslation: e.target.checked }))} className="h-5 w-5 accent-primary" />
           </label>
         )}
+        <OfflineSection />
         <Section title={t("stats")}>
           <p className="text-sm text-muted-foreground">{num(st.stats.sessions)} {t("sessions")} · {num(st.stats.surahsOpened.length)} {t("opened")}</p>
         </Section>
