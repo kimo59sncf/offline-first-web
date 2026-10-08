@@ -25,15 +25,26 @@ export const RECITERS = [
 
 export type Ayah = { n: number; global: number; ar: string; tr?: string; audio: string };
 
+export const surahUrl = (n: number, lang: Lang, reciter: string) => {
+  const tr = TRANSLATIONS[lang];
+  const eds = ["quran-uthmani", reciter, ...(tr ? [tr.id] : [])].join(",");
+  return `${API}/surah/${n}/editions/${eds}`;
+};
+
 export const surahQuery = (n: number, lang: Lang, reciter: string) =>
   queryOptions({
     queryKey: ["surah", n, lang, reciter],
     staleTime: Infinity,
     queryFn: async (): Promise<Ayah[]> => {
-      const tr = TRANSLATIONS[lang];
-      const eds = ["quran-uthmani", reciter, ...(tr ? [tr.id] : [])].join(",");
-      const res = await fetch(`${API}/surah/${n}/editions/${eds}`);
-      if (!res.ok) throw new Error("network");
+      const url = surahUrl(n, lang, reciter);
+      let res: Response | undefined;
+      try {
+        res = await fetch(url);
+      } catch {
+        // Offline: fall back to text saved from Settings, even without a service worker.
+        if (typeof caches !== "undefined") res = await (await caches.open("cpf-data-v1")).match(url);
+      }
+      if (!res || !res.ok) throw new Error("network");
       const { data } = await res.json();
       const [text, audio, trans] = data;
       return text.ayahs.map((a: { numberInSurah: number; number: number; text: string }, i: number) => ({
