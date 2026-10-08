@@ -2,6 +2,7 @@ import { useStore, type Lang } from "./store";
 
 const dict = {
   fr: {
+    download: "Télécharger la sourate", removeDownload: "Supprimer le téléchargement", downloaded: "Téléchargée", removeFavorite: "Retirer des favoris", addFavorite: "Ajouter aux favoris", playlist: "Playlist", addPlaylist: "Ajouter à la playlist", removePlaylist: "Retirer de la playlist", playPlaylist: "Écouter la playlist", nextSurah: "Sourate suivante", autoAdvance: "Enchaîner les sourates", favoriteReciters: "Récitateurs favoris", favoriteSurahs: "Sourates favorites", downloads: "Téléchargements", downloadDone: "Sourate téléchargée", close: "Fermer",
     offline: "Hors ligne", offlineBanner: "Vous êtes hors ligne — les sourates enregistrées restent lisibles.", offlineTitle: "Hors ligne & installation", install: "Installer l'application", installed: "Application installée", installHint: "Sur iPhone : Partager → Sur l'écran d'accueil.", saveAll: "Enregistrer les 114 sourates", saved: "sourates enregistrées", saving: "Enregistrement…", clearOffline: "Supprimer les données hors ligne",
     home: "Accueil", surahs: "Sourates", search: "Recherche", favorites: "Favoris", settings: "Réglages",
     morning: "Bonjour", evening: "Bonsoir", tagline: "Lisez et écoutez le Coran, librement.",
@@ -18,6 +19,7 @@ const dict = {
     clearData: "Effacer mes données locales", privacy: "Vos données restent sur cet appareil.",
   },
   en: {
+    download: "Download surah", removeDownload: "Delete download", downloaded: "Downloaded", removeFavorite: "Remove from favorites", addFavorite: "Add to favorites", playlist: "Playlist", addPlaylist: "Add to playlist", removePlaylist: "Remove from playlist", playPlaylist: "Play playlist", nextSurah: "Next surah", autoAdvance: "Continue to next surah", favoriteReciters: "Favorite reciters", favoriteSurahs: "Favorite surahs", downloads: "Downloads", downloadDone: "Surah downloaded", close: "Close",
     offline: "Offline", offlineBanner: "You are offline — saved surahs remain readable.", offlineTitle: "Offline & install", install: "Install the app", installed: "App installed", installHint: "On iPhone: Share → Add to Home Screen.", saveAll: "Save all 114 surahs", saved: "surahs saved", saving: "Saving…", clearOffline: "Delete offline data",
     home: "Home", surahs: "Surahs", search: "Search", favorites: "Favorites", settings: "Settings",
     morning: "Good morning", evening: "Good evening", tagline: "Read and listen to the Quran, freely.",
@@ -34,6 +36,7 @@ const dict = {
     clearData: "Clear my local data", privacy: "Your data stays on this device.",
   },
   ar: {
+    download: "تنزيل السورة", removeDownload: "حذف التنزيل", downloaded: "تم التنزيل", removeFavorite: "إزالة من المفضلة", addFavorite: "إضافة إلى المفضلة", playlist: "قائمة التشغيل", addPlaylist: "إضافة إلى قائمة التشغيل", removePlaylist: "إزالة من قائمة التشغيل", playPlaylist: "تشغيل القائمة", nextSurah: "السورة التالية", autoAdvance: "متابعة السور", favoriteReciters: "القراء المفضلون", favoriteSurahs: "السور المفضلة", downloads: "التنزيلات", downloadDone: "تم تنزيل السورة", close: "إغلاق",
     offline: "غير متصل", offlineBanner: "أنت غير متصل — السور المحفوظة تبقى متاحة للقراءة.", offlineTitle: "دون اتصال والتثبيت", install: "تثبيت التطبيق", installed: "التطبيق مثبت", installHint: "على آيفون: مشاركة ← إضافة إلى الشاشة الرئيسية.", saveAll: "حفظ السور الـ ١١٤", saved: "سور محفوظة", saving: "جارٍ الحفظ…", clearOffline: "حذف بيانات عدم الاتصال",
     home: "الرئيسية", surahs: "السور", search: "بحث", favorites: "المفضلة", settings: "الإعدادات",
     morning: "صباح الخير", evening: "مساء الخير", tagline: "اقرأ القرآن واستمع إليه بحرية.",
