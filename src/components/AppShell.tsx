@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto min-h-screen max-w-3xl pb-40">
       {!online && (
-        <div role="status" className="sticky top-0 z-40 bg-gold px-4 py-2 text-center text-xs font-medium text-foreground">
+        <div role="status" className="sticky top-0 z-40 bg-gold px-4 py-2 text-center text-xs font-medium text-gold-foreground">
           {t("offlineBanner")}
         </div>
       )}

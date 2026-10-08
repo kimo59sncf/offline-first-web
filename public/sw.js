@@ -1,5 +1,5 @@
 // CoranProFree service worker: offline shell + cached Quran text/audio.
-const SHELL = "cpf-shell-v1";
+const SHELL = "cpf-shell-v2";
 const DATA = "cpf-data-v1";
 
 self.addEventListener("install", (e) => {

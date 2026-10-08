@@ -5,7 +5,7 @@
 - [x] 08 FR/EN/AR + RTL (core)
 - [x] 09 Search, history, favorites, bookmarks, progress, local stats
 - [ ] 06 Audio downloads for offline
-- [ ] 07 Offline / installable app (PWA)
+- [x] 07 Offline / installable app (PWA): offline banner, install button, save all 114 surahs
 - [ ] 10 Licensed reciter photos (needs licensed images)
 - [ ] 11 Visual UX polish pass
 - [ ] 12 Hifz (memorisation) V1.1
