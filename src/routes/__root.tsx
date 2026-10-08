@@ -61,7 +61,8 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    if (CHUNK_ERROR.test(String(error?.message ?? error)) && reloadOnceForStaleChunk()) return;
+    const msg = error instanceof Error ? error.message : String(error);
+    if (CHUNK_ERROR.test(msg) && reloadOnceForStaleChunk()) return;
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
