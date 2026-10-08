@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { QueryClient } from "@tanstack/react-query";
 import { DATA_CACHE, offlineSupported } from "./offline";
 import { surahQuery, surahUrl } from "./quran";
 import type { Lang } from "./store";
@@ -83,7 +84,6 @@ export async function cachedAudioUrl(url: string) {
 }
 
 export async function surahTracks(n: number, lang: Lang, reciter: string) {
-  const options = surahQuery(n, lang, reciter);
-  const ayahs = await options.queryFn();
+  const ayahs = await new QueryClient().fetchQuery(surahQuery(n, lang, reciter));
   return ayahs.map((a) => ({ s: n, a: a.n, url: a.audio }));
 }

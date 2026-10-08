@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { setState } from "./store";
+import { getState, setState } from "./store";
+import { cachedAudioUrl, surahTracks } from "./downloads";
+import { followingSurah } from "./playback";
 
 type Track = { s: number; a: number; url: string };
 type Repeat = "off" | "ayah" | "surah";
@@ -8,10 +10,16 @@ type Ctx = {
   speed: number; repeat: Repeat; progress: number;
   playQueue: (q: Track[], start: number) => void;
   toggle: () => void; next: () => void; prev: () => void;
+  nextSurah: () => void;
+  playSurah: (n: number) => Promise<void>;
   setSpeed: (n: number) => void; setRepeat: (r: Repeat) => void; stop: () => void;
 };
 const PlayerCtx = createContext<Ctx | null>(null);
-export const usePlayer = () => useContext(PlayerCtx)!;
+export const usePlayer = () => {
+  const context = useContext(PlayerCtx);
+  if (!context) throw new Error("PlayerProvider required");
+  return context;
+};
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -22,8 +30,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [speed, setSpeed] = useState(1);
   const [repeat, setRepeat] = useState<Repeat>("off");
   const [progress, setProgress] = useState(0);
-  const st = useRef({ queue, index, repeat });
-  st.current = { queue, index, repeat };
+  const request = useRef(0);
+  const blobUrl = useRef<string | null>(null);
+  const st = useRef({ queue, index, repeat, speed });
+  st.current = { queue, index, repeat, speed };
 
   useEffect(() => {
     const el = new Audio();
@@ -37,20 +47,30 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       if (repeat === "ayah") return load(index, queue);
       if (index + 1 < queue.length) return load(index + 1, queue);
       if (repeat === "surah") return load(0, queue);
+      const preferences = getState();
+      const next = followingSurah(queue[index]?.s ?? 114, preferences.playlist, preferences.autoAdvance);
+      if (next) { void playSurah(next); return; }
       setPlaying(false);
     };
-    return () => { el.pause(); };
+    return () => { request.current++; el.pause(); if (blobUrl.current) URL.revokeObjectURL(blobUrl.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => { if (audio.current) audio.current.playbackRate = speed; }, [speed]);
 
-  function load(i: number, q: Track[]) {
+  async function load(i: number, q: Track[]) {
     const el = audio.current; const tr = q[i];
     if (!el || !tr) return;
-    setIndex(i); setError(false);
-    el.src = tr.url; el.playbackRate = speed;
-    el.play().catch(() => setError(true));
+    const id = ++request.current;
+    el.pause(); setIndex(i); setError(false); setProgress(0);
+    st.current = { ...st.current, queue: q, index: i };
+    let url: string;
+    try { url = await cachedAudioUrl(tr.url); } catch { url = tr.url; }
+    if (id !== request.current) { if (url.startsWith("blob:")) URL.revokeObjectURL(url); return; }
+    if (blobUrl.current) URL.revokeObjectURL(blobUrl.current);
+    blobUrl.current = url.startsWith("blob:") ? url : null;
+    el.src = url; el.playbackRate = st.current.speed;
+    el.play().catch(() => { if (id === request.current) setError(true); });
     setState(() => ({ lastListen: { s: tr.s, a: tr.a } }));
     if ("mediaSession" in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({ title: `Surah ${tr.s} · ${tr.a}`, artist: "CoranProFree" });
@@ -59,8 +79,25 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function playSurah(n: number) {
+    const id = ++request.current;
+    audio.current?.pause(); setError(false);
+    const preferences = getState();
+    try {
+      const tracks = await surahTracks(n, preferences.lang, preferences.reciter);
+      if (id !== request.current) return;
+      setQueue(tracks); await load(0, tracks);
+    } catch { if (id === request.current) { setError(true); setPlaying(false); } }
+  }
+
   const value: Ctx = {
     queue, index, playing, error, speed, repeat, progress,
+    playSurah,
+    nextSurah: () => {
+      const preferences = getState();
+      const n = followingSurah(queue[index]?.s ?? 114, preferences.playlist, true);
+      if (n) void playSurah(n);
+    },
     playQueue: (q, start) => { setQueue(q); load(start, q); },
     toggle: () => {
       const el = audio.current; if (!el) return;
@@ -70,7 +107,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     next: () => load(Math.min(index + 1, queue.length - 1), queue),
     prev: () => load(Math.max(index - 1, 0), queue),
     setSpeed, setRepeat,
-    stop: () => { audio.current?.pause(); setQueue([]); },
+    stop: () => { request.current++; audio.current?.pause(); setQueue([]); },
   };
   return <PlayerCtx.Provider value={value}>{children}</PlayerCtx.Provider>;
 }
