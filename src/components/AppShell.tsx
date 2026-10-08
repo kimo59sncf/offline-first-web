@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { BookOpen, Heart, Home, Pause, Play, Search, Settings, SkipBack, SkipForward, X, RotateCw } from "lucide-react";
+import { BookOpen, Heart, Home, Pause, Play, Search, Settings, SkipBack, SkipForward, X, RotateCw, ChevronsRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SurahActions } from "@/components/LibraryControls";
 import { useT, type TKey } from "@/lib/i18n";
 import { usePlayer } from "@/lib/player";
 import { surah } from "@/lib/quran";
@@ -76,12 +78,13 @@ function MiniPlayer() {
             <div className="truncate text-sm font-semibold">{lang === "ar" ? s.ar : s.tr}</div>
             <div className="text-xs opacity-70">{t("ayah")} {num(tr.a)}{p.error && ` · ${t("error")}`}</div>
           </Link>
-          <button aria-label={t("prev")} onClick={p.prev} className="rounded-full p-2 hover:bg-background/10"><SkipBack className="h-4 w-4 rtl:rotate-180" /></button>
-          <button aria-label={p.error ? t("retry") : p.playing ? t("pause") : t("play")} onClick={p.toggle} className="rounded-full bg-primary p-2.5 text-primary-foreground">
+          <Button size="icon" variant="ghost" aria-label={t("prev")} title={t("prev")} onClick={p.prev}><SkipBack className="rtl:rotate-180" /></Button>
+          <Button size="icon" aria-label={p.error ? t("retry") : p.playing ? t("pause") : t("play")} onClick={p.toggle}>
             {p.error ? <RotateCw className="h-4 w-4" /> : p.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </button>
-          <button aria-label={t("next")} onClick={p.next} className="rounded-full p-2 hover:bg-background/10"><SkipForward className="h-4 w-4 rtl:rotate-180" /></button>
-          <button aria-label="Close" onClick={p.stop} className="rounded-full p-2 opacity-70 hover:bg-background/10"><X className="h-4 w-4" /></button>
+          </Button>
+          <Button size="icon" variant="ghost" aria-label={t("next")} title={t("next")} onClick={p.next}><SkipForward className="rtl:rotate-180" /></Button>
+          <Button size="icon" variant="ghost" aria-label={t("nextSurah")} title={t("nextSurah")} disabled={tr.s === 114} onClick={p.nextSurah}><ChevronsRight className="rtl:rotate-180" /></Button>
+          <Button size="icon" variant="ghost" aria-label={t("close")} onClick={p.stop}><X /></Button>
         </div>
       </div>
     </div>
@@ -101,17 +104,20 @@ export function SurahRow({ n }: { n: number }) {
   const { t, num, lang } = useT();
   const s = surah(n);
   return (
-    <Link to="/surah/$id" params={{ id: String(n) }} className="flex items-center gap-4 rounded-xl px-4 py-3 transition-colors hover:bg-card">
+    <div className="flex flex-wrap items-center gap-x-2 border-b px-3 py-2">
+    <Link to="/surah/$id" params={{ id: String(n) }} className="flex min-w-0 flex-1 items-center gap-3 py-2 transition-colors hover:bg-card">
       <span className="grid h-10 w-10 shrink-0 rotate-45 place-items-center rounded-lg border border-gold/50 text-xs font-semibold text-gold">
         <span className="-rotate-45">{num(n)}</span>
       </span>
-      <div className="min-w-0 flex-1">
+       <div className="min-w-0 flex-1">
         <div className="font-semibold">{s.tr}</div>
         <div className="text-xs text-muted-foreground">
           {lang !== "ar" && `${s.en} · `}{num(s.ayahs)} {t("ayahs")} · {t(s.type === "Meccan" ? "meccan" : "medinan")}
         </div>
       </div>
-      <span dir="rtl" className="font-quran text-xl text-primary">{s.ar.replace("سُورَةُ ", "")}</span>
+      <span dir="rtl" className="font-quran hidden text-xl text-primary sm:block">{s.ar.replace("سُورَةُ ", "")}</span>
     </Link>
+    <SurahActions n={n} />
+    </div>
   );
 }

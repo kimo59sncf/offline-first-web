@@ -5,6 +5,7 @@ import { RECITERS, TRANSLATIONS } from "@/lib/quran";
 import { usePlayer } from "@/lib/player";
 import { PageHeader } from "@/components/AppShell";
 import { OfflineSection } from "@/components/OfflineSection";
+import { ReciterPicker } from "@/components/LibraryControls";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -32,7 +33,7 @@ function SettingsPage() {
           {LANGS.map((l) => <button key={l.id} className={chip(st.lang === l.id)} onClick={() => setState(() => ({ lang: l.id }))}>{l.label}</button>)}
         </Section>
         <Section title={t("reciter")}>
-          {RECITERS.map((r) => <button key={r.id} className={chip(st.reciter === r.id)} onClick={() => setState(() => ({ reciter: r.id }))}>{lang === "ar" ? r.ar : r.name}</button>)}
+          <ReciterPicker />
         </Section>
         <Section title={t("speed")}>
           {[0.5, 0.75, 1, 1.25, 1.5, 2].map((v) => <button key={v} className={chip(p.speed === v)} onClick={() => p.setSpeed(v)}>{num(v)}×</button>)}
@@ -40,6 +41,10 @@ function SettingsPage() {
         <Section title={t("repeat")}>
           {(["off", "ayah", "surah"] as const).map((r) => <button key={r} className={chip(p.repeat === r)} onClick={() => p.setRepeat(r)}>{t(r === "off" ? "repeatOff" : r === "ayah" ? "repeatAyah" : "repeatSurah")}</button>)}
         </Section>
+        <label className="flex items-center justify-between gap-4">
+          <span>{t("autoAdvance")}</span>
+          <input type="checkbox" checked={st.autoAdvance} onChange={(e) => setState(() => ({ autoAdvance: e.target.checked }))} className="h-5 w-5 accent-primary" />
+        </label>
         <Section title={t("fontSize")}>
           <input type="range" min={22} max={48} value={st.fontSize} onChange={(e) => setState(() => ({ fontSize: Number(e.target.value) }))} className="w-full accent-primary" aria-label={t("fontSize")} />
           <p dir="rtl" className="font-quran w-full text-right" style={{ fontSize: st.fontSize }}>ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ</p>
