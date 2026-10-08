@@ -13,9 +13,11 @@ export function OfflineSection() {
   const [saved, setSaved] = useState(0);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(false);
+  const [supported, setSupported] = useState(false);
   const abort = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    setSupported(offlineSupported());
     countSavedSurahs(lang, reciter).then(setSaved).catch(() => {});
   }, [lang, reciter]);
   useEffect(() => () => abort.current?.abort(), []);
@@ -46,7 +48,7 @@ export function OfflineSection() {
         ) : (
           <p className="text-xs text-muted-foreground">{t("installHint")}</p>
         )}
-        {offlineSupported() && (
+        {supported && (
           <>
             <div>
               <div className="mb-1 flex justify-between text-sm"><span>{num(saved)} / {num(114)} {t("saved")}</span><span>{num(pct)}%</span></div>
