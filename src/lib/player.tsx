@@ -44,9 +44,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     el.ontimeupdate = () => setProgress(el.duration ? el.currentTime / el.duration : 0);
     el.onended = () => {
       const { queue, index, repeat } = st.current;
-      if (repeat === "ayah") return load(index, queue);
-      if (index + 1 < queue.length) return load(index + 1, queue);
-      if (repeat === "surah") return load(0, queue);
+      if (repeat === "ayah") { void load(index, queue); return; }
+      if (index + 1 < queue.length) { void load(index + 1, queue); return; }
+      if (repeat === "surah") { void load(0, queue); return; }
       const preferences = getState();
       const next = followingSurah(queue[index]?.s ?? 114, preferences.playlist, preferences.autoAdvance);
       if (next) { void playSurah(next); return; }
@@ -101,7 +101,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     playQueue: (q, start) => { setQueue(q); load(start, q); },
     toggle: () => {
       const el = audio.current; if (!el) return;
-      if (error) return load(index, queue);
+      if (error) { void load(index, queue); return; }
       el.paused ? el.play().catch(() => setError(true)) : el.pause();
     },
     next: () => load(Math.min(index + 1, queue.length - 1), queue),
