@@ -17,7 +17,7 @@ export function SurahActions({ n }: { n: number }) {
     <Button size="icon" variant="ghost" title={downloadLabel} aria-label={downloadLabel} aria-pressed={saved} disabled={busy}
       className={saved ? "text-success" : "text-muted-foreground"}
       onClick={async () => { try { if (saved) await removeDownload(n, lang, reciter); else { await downloadSurah(n, lang, reciter); toast.success(t("downloadDone")); } } catch { toast.error(t("error")); } }}>
-      {busy ? <LoaderCircle className="animate-spin" /> : saved ? <CloudCheck /> : <CloudDownload />}
+      {busy ? <LoaderCircle className="animate-spin" /> : saved ? <CloudCheck fill="currentColor" className="text-success" /> : <CloudDownload />}
     </Button>
     <Button size="icon" variant="ghost" title={t(favorite ? "removeFavorite" : "addFavorite")} aria-label={t(favorite ? "removeFavorite" : "addFavorite")} aria-pressed={favorite}
       className={favorite ? "text-favorite" : "text-muted-foreground"} onClick={() => setState((s) => ({ favoriteSurahs: toggleSurah(s.favoriteSurahs, n) }))}>
