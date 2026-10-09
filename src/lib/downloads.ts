@@ -3,6 +3,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { DATA_CACHE, offlineSupported } from "./offline";
 import { surahQuery, surahUrl } from "./quran";
 import type { Lang } from "./store";
+import { audioDownloadUrl } from "./audio-source";
 
 const listeners = new Set<() => void>();
 const pending = new Set<string>();
@@ -40,9 +41,13 @@ export async function downloadSurah(n: number, lang: Lang, reciter: string) {
         const ayah = queue.shift();
         if (!ayah) return;
         if (await cache.match(ayah.audio)) continue;
-        const audio = await fetch(ayah.audio);
+        // The official CDN permits media playback, but not cross-origin fetch.
+        // Fetch via our allowlisted relay; keep the original URL as the cache key.
+        const audio = await fetch(audioDownloadUrl(ayah.audio));
         if (!audio.ok) throw new Error("network");
-        await cache.put(ayah.audio, audio);
+        const blob = await audio.blob();
+        if (!blob.size || !blob.type.startsWith("audio/")) throw new Error("network");
+        await cache.put(ayah.audio, new Response(blob, { headers: { "Content-Type": blob.type } }));
       }
     };
     // Wait for every worker before clearing the busy state, even on a failed download.

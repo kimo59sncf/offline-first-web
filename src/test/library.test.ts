@@ -45,7 +45,7 @@ describe("Offline downloads", () => {
   const entries = new Map<string, Response>();
   const metadata = () => new Response(JSON.stringify({ data: [
     { ayahs: [{ numberInSurah: 1, number: 1, text: "verified-fixture" }] },
-    { ayahs: [{ audio: "https://cdn.islamic.network/test.mp3" }] },
+    { ayahs: [{ audio: "https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3" }] },
   ] }));
   beforeEach(() => {
     entries.clear();
@@ -54,13 +54,13 @@ describe("Offline downloads", () => {
       put: async (url: string, response: Response) => { entries.set(url, response.clone()); },
       delete: async (url: string) => entries.delete(url),
     }) });
-    vi.stubGlobal("fetch", vi.fn(async (url: string) => url.endsWith(".mp3") ? new Response("audio") : metadata()));
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => url.startsWith("/api/public/quran-audio?") ? new Response("audio", { headers: { "Content-Type": "audio/mpeg" } }) : metadata()));
   });
   it("colors the download state only after metadata and all audio are saved", async () => {
     expect(await isDownloaded(1, "fr", "ar.alafasy")).toBe(false);
     await downloadSurah(1, "fr", "ar.alafasy");
     expect(await isDownloaded(1, "fr", "ar.alafasy")).toBe(true);
-    entries.delete("https://cdn.islamic.network/test.mp3");
+    entries.delete("https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3");
     expect(await isDownloaded(1, "fr", "ar.alafasy")).toBe(false);
   });
   it("removing a favorite does not delete a downloaded surah", async () => {
@@ -76,6 +76,16 @@ describe("Offline downloads", () => {
     const options = surahQuery(1, "fr", "ar.alafasy");
     if (typeof options.queryFn !== "function") throw new Error("Missing query function");
     const data = await options.queryFn({ client: {} as never, queryKey: options.queryKey, signal: new AbortController().signal, meta: undefined });
-    expect(data?.[0]?.audio).toBe("https://cdn.islamic.network/test.mp3");
+    expect(data?.[0]?.audio).toBe("https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3");
+  });
+  it("rejects failed audio downloads without marking the surah saved", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => url.startsWith("/api/") ? new Response("Unavailable", { status: 502 }) : metadata()));
+    await expect(downloadSurah(1, "fr", "ar.alafasy")).rejects.toThrow("network");
+    expect(await isDownloaded(1, "fr", "ar.alafasy")).toBe(false);
+  });
+  it("does not cache an empty or non-audio response", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => url.startsWith("/api/") ? new Response("<html>error</html>", { headers: { "Content-Type": "text/html" } }) : metadata()));
+    await expect(downloadSurah(1, "fr", "ar.alafasy")).rejects.toThrow("network");
+    expect(await isDownloaded(1, "fr", "ar.alafasy")).toBe(false);
   });
 });
