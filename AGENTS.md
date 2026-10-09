@@ -16,3 +16,4 @@
 - Cached audio is played through revocable blob URLs with request ordering guards. Why: offline playback must work without a service worker and avoid media range-request failures or stale async playback.
 - The playback continuation rule lives in a browser-safe pure module; playlist order takes precedence over numeric surah progression. Why: keep next-surah behavior consistent and independently testable.
 - Keep the player context and hook in a non-component module, with the provider exporting only its component. Why: Fast Refresh must not replace the context identity independently of mounted consumers.
+- Download official verse audio through a read-only, host/path/reciter-allowlisted streaming relay, retaining original CDN cache keys. Why: the source CDN blocks browser fetch through CORS, while original keys preserve offline playback compatibility.

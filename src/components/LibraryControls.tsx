@@ -34,13 +34,18 @@ export function ReciterPicker({ favoritesOnly = false }: { favoritesOnly?: boole
   const { t, lang } = useT();
   const selected = useStore((s) => s.reciter);
   const favorites = useStore((s) => s.favoriteReciters);
-  const list = [...RECITERS].filter((r) => !favoritesOnly || favorites.includes(r.id)).sort((a, b) => Number(favorites.includes(b.id)) - Number(favorites.includes(a.id)));
-  return <div className="flex flex-wrap gap-2">
+  const list = RECITERS.filter((r) => !favoritesOnly || favorites.includes(r.id));
+  return <div role="region" aria-label={t("reciters")} className="flex gap-3 overflow-x-auto px-1 py-2">
     {list.map((r) => {
       const favorite = favorites.includes(r.id);
-      return <div key={r.id} className="flex max-w-full items-center gap-1">
-        <Button variant={selected === r.id ? "default" : "outline"} aria-pressed={selected === r.id} className="h-auto whitespace-normal text-start" onClick={() => setState(() => ({ reciter: r.id }))}>{lang === "ar" ? r.ar : r.name}</Button>
-        <Button variant="ghost" size="icon" aria-label={`${t(favorite ? "removeFavorite" : "addFavorite")} · ${lang === "ar" ? r.ar : r.name}`} title={t(favorite ? "removeFavorite" : "addFavorite")} aria-pressed={favorite} className={favorite ? "text-favorite" : "text-muted-foreground"} onClick={() => setState((s) => ({ favoriteReciters: toggleIn(s.favoriteReciters, r.id) }))}><Heart fill={favorite ? "currentColor" : "none"} /></Button>
+      const on = selected === r.id;
+      const name = lang === "ar" ? r.ar : r.name;
+      return <div key={r.id} className="relative w-28 shrink-0 text-center">
+        <Button variant="ghost" aria-label={name} title={name} aria-pressed={on} className="h-auto w-full flex-col gap-2 whitespace-normal p-0 hover:bg-transparent" onClick={() => setState(() => ({ reciter: r.id }))}>
+          <span className={`grid h-16 w-16 shrink-0 place-items-center rounded-full font-display text-xl font-semibold transition-colors ${on ? "bg-primary text-primary-foreground ring-2 ring-gold ring-offset-2 ring-offset-background" : "bg-accent text-accent-foreground"}`} aria-hidden="true">{r.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>
+          <span className={`min-h-10 w-full text-xs leading-tight ${on ? "font-semibold text-primary" : "font-medium"}`}>{name}</span>
+        </Button>
+        <Button variant="outline" size="icon" aria-label={`${t(favorite ? "removeFavorite" : "addFavorite")} · ${name}`} title={t(favorite ? "removeFavorite" : "addFavorite")} aria-pressed={favorite} className={`absolute end-2 top-10 h-7 w-7 rounded-full ${favorite ? "text-favorite" : "text-muted-foreground"}`} onClick={() => setState((s) => ({ favoriteReciters: toggleIn(s.favoriteReciters, r.id) }))}><Heart fill={favorite ? "currentColor" : "none"} /></Button>
       </div>;
     })}
   </div>;
