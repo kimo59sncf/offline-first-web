@@ -15,6 +15,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SurahsRouteImport } from './routes/surahs'
 import { Route as SurahIdRouteImport } from './routes/surah.$id'
+import { Route as ApiPublicQuranAudioRouteImport } from './routes/api/public/quran-audio'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const SurahIdRoute = SurahIdRouteImport.update({
   path: '/surah/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQuranAudioRoute = ApiPublicQuranAudioRouteImport.update({
+  id: '/api/public/quran-audio',
+  path: '/api/public/quran-audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/surahs': typeof SurahsRoute
   '/surah/$id': typeof SurahIdRoute
+  '/api/public/quran-audio': typeof ApiPublicQuranAudioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/surahs': typeof SurahsRoute
   '/surah/$id': typeof SurahIdRoute
+  '/api/public/quran-audio': typeof ApiPublicQuranAudioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,13 +79,27 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/surahs': typeof SurahsRoute
   '/surah/$id': typeof SurahIdRoute
+  '/api/public/quran-audio': typeof ApiPublicQuranAudioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/favorites' | '/search' | '/settings' | '/surahs' | '/surah/$id'
+    | '/'
+    | '/favorites'
+    | '/search'
+    | '/settings'
+    | '/surahs'
+    | '/surah/$id'
+    | '/api/public/quran-audio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/favorites' | '/search' | '/settings' | '/surahs' | '/surah/$id'
+  to:
+    | '/'
+    | '/favorites'
+    | '/search'
+    | '/settings'
+    | '/surahs'
+    | '/surah/$id'
+    | '/api/public/quran-audio'
   id:
     | '__root__'
     | '/'
@@ -86,6 +108,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/surahs'
     | '/surah/$id'
+    | '/api/public/quran-audio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +118,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SurahsRoute: typeof SurahsRoute
   SurahIdRoute: typeof SurahIdRoute
+  ApiPublicQuranAudioRoute: typeof ApiPublicQuranAudioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SurahIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/quran-audio': {
+      id: '/api/public/quran-audio'
+      path: '/api/public/quran-audio'
+      fullPath: '/api/public/quran-audio'
+      preLoaderRoute: typeof ApiPublicQuranAudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -151,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SurahsRoute: SurahsRoute,
   SurahIdRoute: SurahIdRoute,
+  ApiPublicQuranAudioRoute: ApiPublicQuranAudioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
