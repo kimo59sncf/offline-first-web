@@ -21,6 +21,10 @@ export const RECITERS = [
   { id: "ar.abdurrahmaansudais", name: "Abdurrahman As-Sudais", ar: "عبدالرحمن السديس" },
   { id: "ar.mahermuaiqly", name: "Maher Al-Muaiqly", ar: "ماهر المعيقلي" },
   { id: "ar.saoodshuraym", name: "Saud Ash-Shuraim", ar: "سعود الشريم" },
+  { id: "ar.ahmedajamy", name: "Ahmed Al-Ajmy", ar: "أحمد العجمي" },
+  { id: "ar.abdullahbasfar", name: "Abdullah Basfar", ar: "عبد الله بصفر" },
+  { id: "ar.muhammadayyoub", name: "Muhammad Ayyoub", ar: "محمد أيوب" },
+  { id: "ar.muhammadjibreel", name: "Muhammad Jibreel", ar: "محمد جبريل" },
 ];
 
 export type Ayah = { n: number; global: number; ar: string; tr?: string; audio: string };

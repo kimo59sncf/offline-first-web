@@ -17,6 +17,10 @@ const EVERYAYAH: Record<string, string> = {
   "ar.abdurrahmaansudais": "Abdurrahmaan_As-Sudais_192kbps",
   "ar.mahermuaiqly": "MaherAlMuaiqly128kbps",
   "ar.saoodshuraym": "Saood_ash-Shuraym_128kbps",
+  "ar.ahmedajamy": "Ahmed_ibn_Ali_al-Ajamy_64kbps_QuranExplorer.Com",
+  "ar.abdullahbasfar": "Abdullah_Basfar_192kbps",
+  "ar.muhammadayyoub": "Muhammad_Ayyoub_128kbps",
+  "ar.muhammadjibreel": "Muhammad_Jibreel_64kbps",
 };
 export function everyAyahUrl(reciter: string, s: number, a: number) {
   const dir = EVERYAYAH[reciter];
@@ -54,7 +58,7 @@ export async function downloadSurah(n: number, lang: Lang, reciter: string) {
     const queue: { audio: string; numberInSurah?: number }[] = [...data[1].ayahs];
     const fetchAudio = async (url: string) => {
       const res = await fetch(url);
-      if (!res.ok) throw new Error("network");
+      if (!res.ok || !res.headers.get("content-type")?.startsWith("audio/")) throw new Error("network");
       const blob = await res.blob();
       if (!blob.size) throw new Error("network");
       return blob;
