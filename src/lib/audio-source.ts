@@ -5,7 +5,7 @@ export function officialAudioUrl(value: string): string | null {
   try {
     const url = new URL(value);
     if (url.origin !== "https://cdn.islamic.network" || url.username || url.password || url.search || url.hash) return null;
-    const match = url.pathname.match(/^\/quran\/audio\/(64|128)\/(ar\.[a-z]+)\/([1-9]\d{0,3})\.mp3$/);
+    const match = url.pathname.match(/^\/quran\/audio\/(64|128|192)\/(ar\.[a-z]+)\/([1-9]\d{0,3})\.mp3$/);
     if (!match || Number(match[3]) > 6236 || !RECITERS.some((r) => r.id === match[2])) return null;
     return url.href;
   } catch { return null; }

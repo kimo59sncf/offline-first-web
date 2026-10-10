@@ -5,6 +5,8 @@ import { useT } from "@/lib/i18n";
 import { setState, toggleIn, toggleSurah, useStore } from "@/lib/store";
 import { downloadSurah, removeDownload, useDownload } from "@/lib/downloads";
 import { RECITERS } from "@/lib/quran";
+import { RECITER_PHOTOS } from "@/lib/reciter-photos";
+import { ReciterPortrait } from "@/components/ReciterPortrait";
 
 export function SurahActions({ n }: { n: number }) {
   const { t, lang } = useT();
@@ -42,7 +44,7 @@ export function ReciterPicker({ favoritesOnly = false }: { favoritesOnly?: boole
       const name = lang === "ar" ? r.ar : r.name;
       return <div key={r.id} className="relative w-28 shrink-0 text-center">
         <Button variant="ghost" aria-label={name} title={name} aria-pressed={on} className="h-auto w-full flex-col gap-2 whitespace-normal p-0 hover:bg-transparent" onClick={() => setState(() => ({ reciter: r.id }))}>
-          <span className={`grid h-16 w-16 shrink-0 place-items-center rounded-full font-display text-xl font-semibold transition-colors ${on ? "bg-primary text-primary-foreground ring-2 ring-gold ring-offset-2 ring-offset-background" : "bg-accent text-accent-foreground"}`} aria-hidden="true">{r.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>
+          <ReciterPortrait key={r.id} src={RECITER_PHOTOS[r.id]} name={r.name} selected={on} />
           <span className={`min-h-10 w-full text-xs leading-tight ${on ? "font-semibold text-primary" : "font-medium"}`}>{name}</span>
         </Button>
         <Button variant="outline" size="icon" aria-label={`${t(favorite ? "removeFavorite" : "addFavorite")} · ${name}`} title={t(favorite ? "removeFavorite" : "addFavorite")} aria-pressed={favorite} className={`absolute end-2 top-10 h-7 w-7 rounded-full ${favorite ? "text-favorite" : "text-muted-foreground"}`} onClick={() => setState((s) => ({ favoriteReciters: toggleIn(s.favoriteReciters, r.id) }))}><Heart fill={favorite ? "currentColor" : "none"} /></Button>

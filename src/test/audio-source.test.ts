@@ -17,6 +17,11 @@ describe("Official audio relay", () => {
     expect(response.status).toBe(400);
     expect(fetcher).not.toHaveBeenCalled();
   });
+  it("accepts verified Basfar audio at the source's 192 kbps bitrate", () => {
+    const url = "https://cdn.islamic.network/quran/audio/192/ar.abdullahbasfar/1.mp3";
+    expect(officialAudioUrl(url)).toBe(url);
+    expect(officialAudioUrl(url.replace("192", "256"))).toBeNull();
+  });
   it("streams official audio without forwarding caller credentials", async () => {
     const fetcher = vi.fn(async () => new Response("audio-bytes", { headers: { "Content-Type": "audio/mpeg" } }));
     vi.stubGlobal("fetch", fetcher);

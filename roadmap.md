@@ -9,6 +9,7 @@
 - [x] Current correction: repair surah downloads and restore the circular reciter carousel
 - [x] 07 Offline / installable app (PWA): offline banner, install button, save all 114 surahs
 - [ ] 10 Licensed reciter photos (needs licensed images)
+- [x] Current request: expand verified reciter selection and replace carousel initials with real portraits
 - [ ] 11 Visual UX polish pass
 - [ ] 12 Hifz (memorisation) V1.1
 - [ ] 13 Islamic AI V1.2
