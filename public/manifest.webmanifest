@@ -4,8 +4,8 @@
   "description": "Lire et écouter le Coran, gratuitement et sans pistage.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#3E6B58",
-  "theme_color": "#3E6B58",
+  "background_color": "#071A17",
+  "theme_color": "#071A17",
   "icons": [
     {
       "src": "../icons/icon-48.webp",

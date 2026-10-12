@@ -103,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "CoranProFree" },
-      { name: "theme-color", content: "#3E6B58" },
+      { name: "theme-color", content: "#071A17" },
     ],
     links: [
       {

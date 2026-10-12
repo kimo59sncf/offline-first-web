@@ -11,7 +11,7 @@ export async function initNative(): Promise<() => void> {
     else void App.minimizeApp();
   });
   StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-  StatusBar.setBackgroundColor({ color: "#3E6B58" }).catch(() => {});
+  StatusBar.setBackgroundColor({ color: "#071A17" }).catch(() => {});
   SplashScreen.hide().catch(() => {});
   const onClick = (e: MouseEvent) => {
     const a = (e.target as HTMLElement | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
