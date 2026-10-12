@@ -9,6 +9,7 @@ export type PlayerContextValue = {
   toggle: () => void; next: () => void; prev: () => void;
   nextSurah: () => void;
   playSurah: (n: number) => Promise<void>;
+  playRandomSurah: () => Promise<void>;
   setSpeed: (n: number) => void; setRepeat: (r: Repeat) => void; stop: () => void;
 };
 

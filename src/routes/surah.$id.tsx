@@ -1,12 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { Bookmark, ChevronLeft, ChevronRight, Copy, Heart, Pause, Play, Share2 } from "lucide-react";
+import { Bookmark, ChevronLeft, ChevronRight, Copy, Heart, Pause, Play, Share2, Shuffle } from "lucide-react";
 import { toast } from "sonner";
 import { useT } from "@/lib/i18n";
 import { setState, toggleIn, useStore } from "@/lib/store";
-import { surahQuery, SURAHS, surah, type Ayah } from "@/lib/quran";
+import { useDownload } from "@/lib/downloads";
+import { surahQuery, SURAHS, surah, RECITERS, type Ayah } from "@/lib/quran";
 import { usePlayer } from "@/lib/player-context";
+import { RECITER_PHOTOS } from "@/lib/reciter-photos";
 import { Button } from "@/components/ui/button";
 import { SurahActions, ReciterPicker } from "@/components/LibraryControls";
 
@@ -18,7 +20,7 @@ export const Route = createFileRoute("/surah/$id")({
   head: ({ params }) => {
     const s = SURAHS[Number(params.id) - 1];
     const title = s ? `Sourate ${s.tr} (${s.ar}) — CoranProFree` : "CoranProFree";
-    const desc = s ? `Lire et écouter la sourate ${s.tr} — ${s.en}, ${s.ayahs} versets.` : "";
+    const desc = s ? `Lire et écouter la sourate ${s.tr} — ${s.ayahs} versets.` : "";
     return { meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title }, { name: "description", content: desc }, { property: "og:title", content: title }, { property: "og:description", content: desc }] };
   },
   component: Reader,
@@ -29,9 +31,14 @@ function Reader() {
   const s = surah(n);
   const { t, num, lang } = useT();
   const reciter = useStore((x) => x.reciter);
+  const favorite = useStore((x) => (x.favoriteSurahs[x.reciter] ?? []).includes(n));
+  const { saved, busy } = useDownload(n, lang, reciter);
   const showTr = useStore((x) => x.showTranslation);
   const q = useQuery(surahQuery(n, lang, reciter));
   const p = usePlayer();
+  const reciterInfo = RECITERS.find((r) => r.id === reciter);
+  const reciterLabel = (lang === "ar" ? reciterInfo?.ar : reciterInfo?.name) ?? reciter;
+  const portrait = RECITER_PHOTOS[reciter];
 
   useEffect(() => {
     setState((st) => ({
@@ -53,23 +60,41 @@ function Reader() {
 
   return (
     <div>
-      <header className="bg-hero m-3 rounded-3xl px-6 py-8 text-center text-primary-foreground">
-        <div className="flex items-center justify-between text-sm opacity-80">
-          {n > 1 ? <Link to="/surah/$id" params={{ id: String(n - 1) }} aria-label={t("prev")}><ChevronLeft className="h-5 w-5 rtl:rotate-180" /></Link> : <span />}
-          <span>{num(n)}</span>
-          {n < 114 ? <Link to="/surah/$id" params={{ id: String(n + 1) }} aria-label={t("next")}><ChevronRight className="h-5 w-5 rtl:rotate-180" /></Link> : <span />}
+      <header className="bg-hero-premium relative m-3 overflow-hidden rounded-3xl text-primary-foreground shadow-soft">
+        <div className="pattern absolute inset-0 opacity-30" aria-hidden="true" />
+        <div className="relative px-6 py-8 text-center">
+          <div className="flex items-center justify-between">
+            {n > 1 ? <Link to="/surah/$id" params={{ id: String(n - 1) }} aria-label={t("prev")} className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition-colors hover:bg-white/20"><ChevronLeft className="h-5 w-5 rtl:rotate-180" /></Link> : <span className="h-9 w-9" />}
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest">{t("surah")} {num(n)}</span>
+            {n < 114 ? <Link to="/surah/$id" params={{ id: String(n + 1) }} aria-label={t("next")} className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition-colors hover:bg-white/20"><ChevronRight className="h-5 w-5 rtl:rotate-180" /></Link> : <span className="h-9 w-9" />}
+          </div>
+
+          <div className="mt-5 inline-flex items-center gap-3 rounded-full bg-white/10 py-1.5 pe-4 ps-1.5 backdrop-blur-sm">
+            <span className="relative block h-10 w-10 overflow-hidden rounded-full ring-2 ring-gold/70">
+              {portrait ? <img src={portrait} alt="" width={40} height={40} loading="lazy" decoding="async" className="h-full w-full object-cover" /> : <span className="grid h-full w-full place-items-center bg-accent text-sm font-semibold text-accent-foreground">{reciterLabel.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>}
+            </span>
+            <span className="text-sm font-medium">{reciterLabel}</span>
+            {current !== null && p.playing && <span className="flex items-end gap-0.5 text-gold" aria-label={t("nowPlaying")}><span className="eq-bar" /><span className="eq-bar" style={{ animationDelay: "150ms" }} /><span className="eq-bar" style={{ animationDelay: "300ms" }} /></span>}
+          </div>
+
+          <p dir="rtl" className="font-quran mt-5 text-4xl text-gold drop-shadow-sm">{s.ar}</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">{s.tr}</h1>
+          <p className="mt-1 text-sm text-white/80">{lang === "en" && `${s.en} · `}{num(s.ayahs)} {t("ayahs")} · {t(s.type === "Meccan" ? "meccan" : "medinan")}</p>
+
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <button onClick={() => (current !== null ? p.toggle() : play(0))} disabled={!q.data && current === null} className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-gold-foreground shadow-lg transition-transform hover:scale-[1.03] disabled:opacity-50">
+              {current !== null && p.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />} {t("playSurah")}
+            </button>
+            <button onClick={() => void p.playRandomSurah()} className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold backdrop-blur-sm transition-colors hover:bg-white/20">
+              <Shuffle className="h-4 w-4" /> {t("surpriseMe")}
+            </button>
+          </div>
         </div>
-        <p dir="rtl" className="font-quran mt-2 text-4xl text-gold">{s.ar}</p>
-        <h1 className="mt-2 text-3xl font-semibold">{s.tr}</h1>
-        <p className="text-sm opacity-80">{lang !== "ar" && `${s.en} · `}{num(s.ayahs)} {t("ayahs")} · {t(s.type === "Meccan" ? "meccan" : "medinan")}</p>
-        <button onClick={() => play(0)} disabled={!q.data} className="mt-5 inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-gold-foreground disabled:opacity-50">
-          <Play className="h-4 w-4" /> {t("playSurah")}
-        </button>
       </header>
 
       <section className="space-y-3 px-5 py-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <SurahActions n={n} />
+          <SurahActions n={n} favorite={favorite} saved={saved} busy={busy} />
           <Button variant="outline" disabled={n === 114} onClick={() => p.playSurah(n + 1)}><ChevronRight className="rtl:rotate-180" />{t("nextSurah")}</Button>
         </div>
         <details>

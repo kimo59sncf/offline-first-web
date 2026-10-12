@@ -18,3 +18,6 @@
 - Keep the player context and hook in a non-component module, with the provider exporting only its component. Why: Fast Refresh must not replace the context identity independently of mounted consumers.
 - Download official verse audio through a read-only, host/path/reciter-allowlisted streaming relay, retaining original CDN cache keys. Why: the source CDN blocks browser fetch through CORS, while original keys preserve offline playback compatibility.
 - Keep verified reciter IDs in the shared Quran catalogue and real portrait CDN pointers in a separate browser-safe mapping. Why: every carousel shares identity-correct portraits without introducing image dependencies into the audio relay.
+- Native apps use Capacitor with a separate static SPA build (vite.mobile.config.ts → dist-mobile); vite.config.ts stays the web/SSR build. Why: Capacitor needs embedded files while the website keeps SSR.
+- Server routes called from the native app use apiOrigin() (VITE_PUBLIC_API_ORIGIN, native only) and allow only Capacitor origins via CORS. Why: the native WebView is not same-origin with the published server.
+- Native-only behavior (back button, status bar, splash, external links) lives in src/lib/native.ts behind isNativeApp() with dynamic plugin imports. Why: keep the web bundle and SSR untouched.

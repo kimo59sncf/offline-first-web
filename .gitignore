@@ -30,3 +30,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Mobile
+dist-mobile
+android/keystore.properties
+*.jks
+*.keystore

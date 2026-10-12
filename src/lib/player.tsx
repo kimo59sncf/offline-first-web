@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getState, setState } from "./store";
 import { cachedAudioUrl, surahTracks } from "./downloads";
-import { followingSurah } from "./playback";
+import { followingSurah, randomSurah } from "./playback";
 import { PlayerCtx, type PlayerContextValue, type Track, type Repeat } from "./player-context";
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
@@ -73,9 +73,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     } catch { if (id === request.current) { setError(true); setPlaying(false); } }
   }
 
+  async function playRandomSurah() {
+    // Always draw from the full Quran (never restricted to the playlist), and
+    // skip the surah currently playing so repeated taps always change.
+    await playSurah(randomSurah(st.current.queue[st.current.index]?.s));
+  }
+
   const value: PlayerContextValue = {
     queue, index, playing, error, speed, repeat, progress,
     playSurah,
+    playRandomSurah,
     nextSurah: () => {
       const preferences = getState();
       const n = followingSurah(queue[index]?.s ?? 114, preferences.playlist, true);

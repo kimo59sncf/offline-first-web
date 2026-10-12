@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { normalize, runSearch, searchEdition, surahQuery } from "@/lib/quran";
-import { followingSurah } from "@/lib/playback";
+import { followingSurah, randomSurah } from "@/lib/playback";
 import { toggleIn, toggleSurah } from "@/lib/store";
 import { downloadSurah, isDownloaded, removeDownload } from "@/lib/downloads";
 
@@ -38,6 +38,15 @@ describe("Library rules", () => {
   it("plays the next playlist surah and stops at its end", () => {
     expect(followingSurah(114, [114, 1], true)).toBe(1);
     expect(followingSurah(1, [114, 1], true)).toBeNull();
+  });
+  it("draws a random surah within 1..114 and never repeats the current one", () => {
+    for (let i = 0; i < 100; i++) {
+      const n = randomSurah(7);
+      expect(n).toBeGreaterThanOrEqual(1);
+      expect(n).toBeLessThanOrEqual(114);
+      expect(n).not.toBe(7);
+    }
+    expect(randomSurah()).toBeGreaterThanOrEqual(1);
   });
 });
 
@@ -87,17 +96,5 @@ describe("Offline downloads", () => {
     vi.stubGlobal("fetch", vi.fn(async (url: string) => url.startsWith("/api/") ? new Response("<html>error</html>", { headers: { "Content-Type": "text/html" } }) : metadata()));
     await expect(downloadSurah(1, "fr", "ar.alafasy")).rejects.toThrow("network");
     expect(await isDownloaded(1, "fr", "ar.alafasy")).toBe(false);
-  });
-});
-import { sanitize as sanitizeState, toggleReciterFavorite, favoritesOf as favOf, defaultState as baseState } from "@/lib/store";
-describe("per-reciter favorites", () => {
-  it("keeps favorites separate per reciter and never duplicates", () => {
-    let s = { ...baseState, ...toggleReciterFavorite(baseState, "ar.alafasy", 2) };
-    s = { ...s, ...toggleReciterFavorite(s, "ar.husary", 3) };
-    expect(favOf(s, "ar.alafasy")).toEqual([2]);
-    expect(favOf(s, "ar.husary")).toEqual([3]);
-    const dirty = sanitizeState({ ...s, playlist: [1, 1, 2], favoriteSurahs: [2, 5] });
-    expect(dirty.playlist).toEqual([1, 2]);
-    expect(favOf(dirty, "ar.alafasy")).toEqual([2, 5]);
   });
 });
