@@ -54,6 +54,7 @@ function load() {
   // Migration: legacy favoriteSurahs was a flat array of global favorites.
   if (Array.isArray(state.favoriteSurahs)) state.favoriteSurahs = { [state.reciter]: state.favoriteSurahs };
   if (state.favoriteSurahs == null) state.favoriteSurahs = {};
+  state = dedupe(state);
   state = { ...state, stats: { ...state.stats, sessions: state.stats.sessions + 1 } };
   persist();
 }
@@ -100,3 +101,12 @@ export const toggleFavoriteSurah = (s: AppState, reciter: string, n: number): Pa
 });
 
 export const getState = () => { load(); return state; };
+
+const uniq = <T,>(list: T[] | undefined): T[] => Array.from(new Set(Array.isArray(list) ? list : []));
+
+/** Removes duplicates from every user list (favorites, playlist, bookmarks). */
+export function dedupe(s: AppState): AppState {
+  const fav: Record<string, number[]> = {};
+  for (const [k, v] of Object.entries(s.favoriteSurahs ?? {})) fav[k] = uniq(v);
+  return { ...s, favoriteSurahs: fav, favorites: uniq(s.favorites), bookmarks: uniq(s.bookmarks), favoriteReciters: uniq(s.favoriteReciters), playlist: uniq(s.playlist) };
+}
