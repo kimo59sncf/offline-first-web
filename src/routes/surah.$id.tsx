@@ -64,12 +64,12 @@ function Reader() {
         <div className="pattern absolute inset-0 opacity-30" aria-hidden="true" />
         <div className="relative px-6 py-8 text-center">
           <div className="flex items-center justify-between">
-            {n > 1 ? <Link to="/surah/$id" params={{ id: String(n - 1) }} aria-label={t("prev")} className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition-colors hover:bg-white/20"><ChevronLeft className="h-5 w-5 rtl:rotate-180" /></Link> : <span className="h-9 w-9" />}
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest">{t("surah")} {num(n)}</span>
-            {n < 114 ? <Link to="/surah/$id" params={{ id: String(n + 1) }} aria-label={t("next")} className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition-colors hover:bg-white/20"><ChevronRight className="h-5 w-5 rtl:rotate-180" /></Link> : <span className="h-9 w-9" />}
+            {n > 1 ? <Link to="/surah/$id" params={{ id: String(n - 1) }} aria-label={t("prev")} className="grid h-9 w-9 place-items-center rounded-full bg-foreground/10 transition-colors hover:bg-foreground/20"><ChevronLeft className="h-5 w-5 rtl:rotate-180" /></Link> : <span className="h-9 w-9" />}
+            <span className="rounded-full bg-foreground/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest">{t("surah")} {num(n)}</span>
+            {n < 114 ? <Link to="/surah/$id" params={{ id: String(n + 1) }} aria-label={t("next")} className="grid h-9 w-9 place-items-center rounded-full bg-foreground/10 transition-colors hover:bg-foreground/20"><ChevronRight className="h-5 w-5 rtl:rotate-180" /></Link> : <span className="h-9 w-9" />}
           </div>
 
-          <div className="mt-5 inline-flex items-center gap-3 rounded-full bg-white/10 py-1.5 pe-4 ps-1.5 backdrop-blur-sm">
+          <div className="mt-5 inline-flex items-center gap-3 rounded-full bg-foreground/10 py-1.5 pe-4 ps-1.5 backdrop-blur-sm">
             <span className="relative block h-10 w-10 overflow-hidden rounded-full ring-2 ring-gold/70">
               {portrait ? <img src={portrait} alt="" width={40} height={40} loading="lazy" decoding="async" className="h-full w-full object-cover" /> : <span className="grid h-full w-full place-items-center bg-accent text-sm font-semibold text-accent-foreground">{reciterLabel.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>}
             </span>
@@ -79,13 +79,13 @@ function Reader() {
 
           <p dir="rtl" className="font-quran mt-5 text-4xl text-gold drop-shadow-sm">{s.ar}</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">{s.tr}</h1>
-          <p className="mt-1 text-sm text-white/80">{lang === "en" && `${s.en} · `}{num(s.ayahs)} {t("ayahs")} · {t(s.type === "Meccan" ? "meccan" : "medinan")}</p>
+          <p className="mt-1 text-sm text-foreground/80">{lang === "en" && `${s.en} · `}{num(s.ayahs)} {t("ayahs")} · {t(s.type === "Meccan" ? "meccan" : "medinan")}</p>
 
           <div className="mt-6 flex items-center justify-center gap-3">
             <button onClick={() => (current !== null ? p.toggle() : play(0))} disabled={!q.data && current === null} className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-gold-foreground shadow-lg transition-transform hover:scale-[1.03] disabled:opacity-50">
               {current !== null && p.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />} {t("playSurah")}
             </button>
-            <button onClick={() => void p.playRandomSurah()} className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold backdrop-blur-sm transition-colors hover:bg-white/20">
+            <button onClick={() => void p.playRandomSurah()} className="inline-flex items-center gap-2 rounded-full border border-foreground/30 bg-foreground/10 px-5 py-2.5 text-sm font-semibold backdrop-blur-sm transition-colors hover:bg-foreground/20">
               <Shuffle className="h-4 w-4" /> {t("surpriseMe")}
             </button>
           </div>

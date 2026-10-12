@@ -51,7 +51,7 @@ function Home() {
           <button onClick={() => void player.playRandomSurah()} className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-gold-foreground shadow-lg transition-transform hover:scale-[1.03]">
             <Shuffle className="h-4 w-4" /> {t("surpriseMe")}
           </button>
-          <Link to="/surahs" className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold backdrop-blur-sm transition-colors hover:bg-white/25">
+          <Link to="/surahs" className="inline-flex items-center gap-2 rounded-full bg-foreground/15 px-5 py-2.5 text-sm font-semibold backdrop-blur-sm transition-colors hover:bg-foreground/25">
             <BookOpen className="h-4 w-4" /> {t("surahs")}
           </Link>
         </div>

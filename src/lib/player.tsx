@@ -97,6 +97,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     next: () => load(Math.min(index + 1, queue.length - 1), queue),
     prev: () => load(Math.max(index - 1, 0), queue),
     setSpeed, setRepeat,
+    seek: (delta) => { const el = audio.current; if (el && el.duration) el.currentTime = Math.max(0, Math.min(el.duration, el.currentTime + delta)); },
     stop: () => { request.current++; audio.current?.pause(); setQueue([]); },
   };
   return <PlayerCtx.Provider value={value}>{children}</PlayerCtx.Provider>;
