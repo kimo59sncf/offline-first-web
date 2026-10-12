@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { LANGS, useT } from "@/lib/i18n";
 import { defaultState, setState, useStore } from "@/lib/store";
 import { RECITERS, TRANSLATIONS } from "@/lib/quran";
@@ -30,7 +30,7 @@ function SettingsPage() {
   return (
     <div>
       <PageHeader title={t("settings")} />
-      <div className="space-y-8 px-5">
+      <div className="space-y-4 px-5">
         <Section title={t("language")}>
           {LANGS.map((l) => <button key={l.id} className={chip(st.lang === l.id)} onClick={() => setState(() => ({ lang: l.id }))}>{l.label}</button>)}
         </Section>
@@ -43,8 +43,8 @@ function SettingsPage() {
         <Section title={t("repeat")}>
           {(["off", "ayah", "surah"] as const).map((r) => <button key={r} className={chip(p.repeat === r)} onClick={() => p.setRepeat(r)}>{t(r === "off" ? "repeatOff" : r === "ayah" ? "repeatAyah" : "repeatSurah")}</button>)}
         </Section>
-        <label className="flex items-center justify-between gap-4">
-          <span>{t("autoAdvance")}</span>
+        <label className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-4">
+          <span className="font-medium">{t("autoAdvance")}</span>
           <input type="checkbox" checked={st.autoAdvance} onChange={(e) => setState(() => ({ autoAdvance: e.target.checked }))} className="h-5 w-5 accent-primary" />
         </label>
         <Section title={t("fontSize")}>
@@ -70,7 +70,8 @@ function SettingsPage() {
         </Section>
         <div className="rounded-2xl bg-muted p-4 text-sm">
           <p>{t("privacy")}</p>
-          <button className="mt-2 font-semibold text-destructive" onClick={() => setState(() => ({ ...defaultState, lang: st.lang }))}>{t("clearData")}</button>
+          <Link to="/privacy" className="mt-2 inline-block font-semibold text-primary underline">{t("privacyPolicy")}</Link>
+          <button className="mt-2 block font-semibold text-destructive" onClick={() => setState(() => ({ ...defaultState, lang: st.lang }))}>{t("clearData")}</button>
         </div>
       </div>
     </div>
@@ -79,7 +80,7 @@ function SettingsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section>
+    <section className="rounded-2xl border bg-card p-4">
       <h2 className="mb-3 text-xl font-semibold">{title}</h2>
       <div className="flex flex-wrap gap-2">{children}</div>
     </section>

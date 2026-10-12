@@ -108,7 +108,7 @@ export function runSearch(index: Indexed[], q: string): SearchHit[] {
   return hits;
 }
 
-export const surahName = (s: Surah, lang: Lang) => (lang === "ar" ? s.ar : s.tr);
+export const surahName = (s: Surah, lang: Lang) => (lang === "ar" ? s.ar.replace("سُورَةُ ", "") : s.tr);
 export const surah = (n: number): Surah => {
   const s = SURAHS[Math.min(Math.max(n, 1), 114) - 1];
   if (!s) throw new Error("Invalid surah");

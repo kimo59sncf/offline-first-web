@@ -15,3 +15,12 @@
 - [ ] 13 Islamic AI V1.2
 - [ ] 14 Production hardening
 - [ ] 15 Final audit
+
+## Demandes en cours
+- [ ] Accueil : 114 sourates, liste par récitateur (toutes / favoris / hors ligne)
+- [ ] Favoris : sections distinctes hors ligne / favoris / playlist, sans doublons
+- [ ] Récupérer la dernière version GitHub (kimo59sncf/coran-pro-setup, branche mobile)
+- [ ] Playlist sur l'accueil
+- [ ] Lecteur plein écran + mini-player : fond dégradé avec image du récitateur (palette émeraude/or/nuit)
+- [ ] Ajouter le récitateur Ahmed Khedr
+- [ ] Moderniser le visuel (Cormorant Garamond + Karla)

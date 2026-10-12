@@ -2,18 +2,16 @@ import { CloudDownload, CloudCheck, Heart, ListPlus, ListChecks, LoaderCircle } 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
-import { favoritesOf, setState, toggleIn, toggleReciterFavorite, toggleSurah, useStore } from "@/lib/store";
-import { downloadSurah, removeDownload, useDownload } from "@/lib/downloads";
+import { setState, toggleFavoriteSurah, toggleIn, toggleSurah, useStore } from "@/lib/store";
+import { downloadSurah, removeDownload } from "@/lib/downloads";
 import { RECITERS } from "@/lib/quran";
 import { RECITER_PHOTOS } from "@/lib/reciter-photos";
 import { ReciterPortrait } from "@/components/ReciterPortrait";
 
-export function SurahActions({ n }: { n: number }) {
+export function SurahActions({ n, favorite, saved, busy }: { n: number; favorite: boolean; saved: boolean; busy: boolean }) {
   const { t, lang } = useT();
   const reciter = useStore((s) => s.reciter);
-  const favorite = useStore((s) => favoritesOf(s, reciter).includes(n));
   const inPlaylist = useStore((s) => s.playlist.includes(n));
-  const { saved, busy } = useDownload(n, lang, reciter);
   const downloadLabel = t(busy ? "saving" : saved ? "removeDownload" : "download");
   return <div className="flex shrink-0 items-center">
     <Button size="icon" variant="ghost" title={downloadLabel} aria-label={downloadLabel} aria-pressed={saved} disabled={busy}
@@ -22,7 +20,7 @@ export function SurahActions({ n }: { n: number }) {
       {busy ? <LoaderCircle className="animate-spin" /> : saved ? <CloudCheck fill="currentColor" className="text-success" /> : <CloudDownload />}
     </Button>
     <Button size="icon" variant="ghost" title={t(favorite ? "removeFavorite" : "addFavorite")} aria-label={t(favorite ? "removeFavorite" : "addFavorite")} aria-pressed={favorite}
-      className={favorite ? "text-favorite" : "text-muted-foreground"} onClick={() => setState((s) => toggleReciterFavorite(s, reciter, n))}>
+      className={favorite ? "text-favorite" : "text-muted-foreground"} onClick={() => setState((s) => toggleFavoriteSurah(s, reciter, n))}>
       <Heart fill={favorite ? "currentColor" : "none"} />
     </Button>
     <Button size="icon" variant="ghost" title={t(inPlaylist ? "removePlaylist" : "addPlaylist")} aria-label={t(inPlaylist ? "removePlaylist" : "addPlaylist")} aria-pressed={inPlaylist}
@@ -32,7 +30,7 @@ export function SurahActions({ n }: { n: number }) {
   </div>;
 }
 
-export function ReciterPicker({ favoritesOnly = false, onSelect }: { favoritesOnly?: boolean; onSelect?: (id: string) => void }) {
+export function ReciterPicker({ favoritesOnly = false }: { favoritesOnly?: boolean }) {
   const { t, lang } = useT();
   const selected = useStore((s) => s.reciter);
   const favorites = useStore((s) => s.favoriteReciters);
@@ -43,7 +41,7 @@ export function ReciterPicker({ favoritesOnly = false, onSelect }: { favoritesOn
       const on = selected === r.id;
       const name = lang === "ar" ? r.ar : r.name;
       return <div key={r.id} className="relative w-28 shrink-0 text-center">
-        <Button variant="ghost" aria-label={name} title={name} aria-pressed={on} className="h-auto w-full flex-col gap-2 whitespace-normal p-0 hover:bg-transparent" onClick={() => { setState(() => ({ reciter: r.id })); onSelect?.(r.id); }}>
+        <Button variant="ghost" aria-label={name} title={name} aria-pressed={on} className="h-auto w-full flex-col gap-2 whitespace-normal p-0 hover:bg-transparent" onClick={() => setState(() => ({ reciter: r.id }))}>
           <ReciterPortrait key={r.id} src={RECITER_PHOTOS[r.id]} name={r.name} selected={on} />
           <span className={`min-h-10 w-full text-xs leading-tight ${on ? "font-semibold text-primary" : "font-medium"}`}>{name}</span>
         </Button>

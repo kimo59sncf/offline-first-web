@@ -6,7 +6,7 @@ import { ReciterPicker } from "@/components/LibraryControls";
 import { useDownloadedSurahs } from "@/lib/downloads";
 import { usePlayer } from "@/lib/player-context";
 import { useT } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { favoriteSurahsOf, useStore } from "@/lib/store";
 import { SURAHS, surah } from "@/lib/quran";
 import { PageHeader } from "@/components/AppShell";
 
@@ -28,7 +28,7 @@ function Favorites() {
   const { t, num } = useT();
   const favs = useStore((s) => s.favorites);
   const bms = useStore((s) => s.bookmarks);
-  const favoriteSurahs = useStore((s) => s.favoriteSurahs);
+  const favoriteSurahs = useStore((s) => favoriteSurahsOf(s, s.reciter));
   const playlist = useStore((s) => s.playlist);
   const favoriteReciters = useStore((s) => s.favoriteReciters);
   const { lang } = useT();
@@ -40,6 +40,10 @@ function Favorites() {
   return (
     <div>
       <PageHeader title={t("favorites")} />
+      <section className="mb-6 px-3">
+        <h2 className="px-2 pb-2 text-xl font-semibold">{t("reciter")}</h2>
+        <ReciterPicker />
+      </section>
       <section className="mb-6 px-3">
         <h2 className="px-2 pb-2 text-xl font-semibold">{t("favoriteSurahs")}</h2>
         {favoriteSurahs.map((n) => <SurahRow n={n} key={n} />)}

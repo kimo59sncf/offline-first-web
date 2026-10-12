@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { normalize, runSearch, searchEdition, surahQuery } from "@/lib/quran";
-import { followingSurah } from "@/lib/playback";
+import { followingSurah, randomSurah } from "@/lib/playback";
 import { toggleIn, toggleSurah } from "@/lib/store";
 import { downloadSurah, isDownloaded, removeDownload } from "@/lib/downloads";
 
@@ -38,6 +38,15 @@ describe("Library rules", () => {
   it("plays the next playlist surah and stops at its end", () => {
     expect(followingSurah(114, [114, 1], true)).toBe(1);
     expect(followingSurah(1, [114, 1], true)).toBeNull();
+  });
+  it("draws a random surah within 1..114 and never repeats the current one", () => {
+    for (let i = 0; i < 100; i++) {
+      const n = randomSurah(7);
+      expect(n).toBeGreaterThanOrEqual(1);
+      expect(n).toBeLessThanOrEqual(114);
+      expect(n).not.toBe(7);
+    }
+    expect(randomSurah()).toBeGreaterThanOrEqual(1);
   });
 });
 

@@ -8,8 +8,7 @@ export type AppState = {
   showTranslation: boolean;
   fontSize: number;
   favorites: string[]; // "surah:ayah"
-  favoriteSurahs: number[]; // legacy, migrated into reciterFavorites
-  reciterFavorites: Record<string, number[]>;
+  favoriteSurahs: Record<string, number[]>; // surah favorites per reciter id
   favoriteReciters: string[];
   playlist: number[];
   autoAdvance: boolean;
@@ -28,8 +27,7 @@ export const defaultState: AppState = {
   showTranslation: true,
   fontSize: 30,
   favorites: [],
-  favoriteSurahs: [],
-  reciterFavorites: {},
+  favoriteSurahs: {},
   favoriteReciters: [],
   playlist: [],
   autoAdvance: true,
@@ -53,7 +51,10 @@ function load() {
   } catch {
     /* corrupted storage: keep defaults */
   }
-  state = sanitize(state);
+  // Migration: legacy favoriteSurahs was a flat array of global favorites.
+  if (Array.isArray(state.favoriteSurahs)) state.favoriteSurahs = { [state.reciter]: state.favoriteSurahs };
+  if (state.favoriteSurahs == null) state.favoriteSurahs = {};
+  state = dedupe(state);
   state = { ...state, stats: { ...state.stats, sessions: state.stats.sessions + 1 } };
   persist();
 }
@@ -87,28 +88,25 @@ export const toggleIn = (list: string[], k: string) =>
 export const toggleSurah = (list: number[], n: number) =>
   list.includes(n) ? list.filter((x) => x !== n) : [...list, n];
 
+// Stable empty reference so `useStore` selectors never return a fresh array.
+const EMPTY_SURAHS: number[] = [];
+
+/** Surah favorites for a given reciter (empty list when none). */
+export const favoriteSurahsOf = (s: AppState, reciter: string): number[] =>
+  s.favoriteSurahs[reciter] ?? EMPTY_SURAHS;
+
+/** Toggle a surah in the per-reciter favorites map. */
+export const toggleFavoriteSurah = (s: AppState, reciter: string, n: number): Partial<AppState> => ({
+  favoriteSurahs: { ...s.favoriteSurahs, [reciter]: toggleSurah(favoriteSurahsOf(s, reciter), n) },
+});
+
 export const getState = () => { load(); return state; };
 
 const uniq = <T,>(list: T[] | undefined): T[] => Array.from(new Set(Array.isArray(list) ? list : []));
 
-/** Removes duplicates and migrates legacy global surah favorites to the current reciter. */
-export function sanitize(s: AppState): AppState {
-  const rf: Record<string, number[]> = {};
-  for (const [k, v] of Object.entries(s.reciterFavorites ?? {})) rf[k] = uniq(v);
-  if (s.favoriteSurahs?.length) rf[s.reciter] = uniq([...(rf[s.reciter] ?? []), ...s.favoriteSurahs]);
-  return {
-    ...s,
-    favoriteSurahs: [],
-    reciterFavorites: rf,
-    favorites: uniq(s.favorites),
-    bookmarks: uniq(s.bookmarks),
-    favoriteReciters: uniq(s.favoriteReciters),
-    playlist: uniq(s.playlist),
-  };
+/** Removes duplicates from every user list (favorites, playlist, bookmarks). */
+export function dedupe(s: AppState): AppState {
+  const fav: Record<string, number[]> = {};
+  for (const [k, v] of Object.entries(s.favoriteSurahs ?? {})) fav[k] = uniq(v);
+  return { ...s, favoriteSurahs: fav, favorites: uniq(s.favorites), bookmarks: uniq(s.bookmarks), favoriteReciters: uniq(s.favoriteReciters), playlist: uniq(s.playlist) };
 }
-
-const EMPTY: number[] = [];
-export const favoritesOf = (s: AppState, reciter: string) => s.reciterFavorites[reciter] ?? EMPTY;
-export const toggleReciterFavorite = (s: AppState, reciter: string, n: number) => ({
-  reciterFavorites: { ...s.reciterFavorites, [reciter]: toggleSurah(favoritesOf(s, reciter), n) },
-});

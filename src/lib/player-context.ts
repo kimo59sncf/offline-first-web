@@ -9,7 +9,8 @@ export type PlayerContextValue = {
   toggle: () => void; next: () => void; prev: () => void;
   nextSurah: () => void;
   playSurah: (n: number) => Promise<void>;
-  setSpeed: (n: number) => void; setRepeat: (r: Repeat) => void; stop: () => void;
+  playRandomSurah: () => Promise<void>;
+  seek: (delta: number) => void; setSpeed: (n: number) => void; setRepeat: (r: Repeat) => void; stop: () => void;
 };
 
 // Keep context identity independent of the provider's Fast Refresh boundary.

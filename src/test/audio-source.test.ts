@@ -35,3 +35,14 @@ describe("Official audio relay", () => {
     expect((await serveQuranAudio(new Request(`https://app.test${audioDownloadUrl(audio)}`))).status).toBe(502);
   });
 });
+import { relayCorsHeaders } from "@/lib/audio-cors";
+describe("Audio relay CORS", () => {
+  it("allows only Capacitor origins, never credentials", () => {
+    for (const o of ["capacitor://localhost", "https://localhost"]) {
+      const h = relayCorsHeaders(new Request("https://x.test", { headers: { Origin: o } }));
+      expect(h["Access-Control-Allow-Origin"]).toBe(o);
+      expect(h["Access-Control-Allow-Credentials"]).toBeUndefined();
+    }
+    expect(relayCorsHeaders(new Request("https://x.test", { headers: { Origin: "https://evil.test" } }))["Access-Control-Allow-Origin"]).toBeUndefined();
+  });
+});

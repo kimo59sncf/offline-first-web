@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useT } from "@/lib/i18n";
 import { setState, useStore } from "@/lib/store";
-import { editionQuery, runSearch, searchEdition, surah } from "@/lib/quran";
+import { editionQuery, runSearch, searchEdition, surah, surahName } from "@/lib/quran";
 import { PageHeader } from "@/components/AppShell";
 
 export const Route = createFileRoute("/search")({
@@ -54,6 +54,9 @@ function SearchPage() {
             </div>
           </>
         )}
+        {q.length <= 2 && history.length === 0 && (
+          <p className="py-10 text-center text-sm text-muted-foreground">{t("searchHint")}</p>
+        )}
         {r.isFetching && <p className="py-8 text-center text-muted-foreground">{t("loading")}</p>}
         {r.isError && <p className="py-8 text-center text-muted-foreground">{t("error")}</p>}
         {r.data && !r.isFetching && (r.data.length === 0
@@ -61,7 +64,7 @@ function SearchPage() {
           : <ul className="divide-y">{r.data.map((h) => (
               <li key={`${h.s}:${h.a}`}>
                 <Link to="/surah/$id" params={{ id: String(h.s) }} hash={`a${h.a}`} className="block py-4">
-                  <div className="text-xs font-semibold text-primary">{surah(h.s).tr} · {num(h.s)}:{num(h.a)}</div>
+                  <div className="text-xs font-semibold text-primary">{surahName(surah(h.s), lang)} · {num(h.s)}:{num(h.a)}</div>
                   <p className="mt-1 text-sm leading-relaxed" dir={lang === "ar" ? "rtl" : "ltr"}>{highlight(h.text, q)}</p>
                 </Link>
               </li>))}

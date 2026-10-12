@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SurahsRouteImport } from './routes/surahs'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -56,6 +62,7 @@ const ApiPublicQuranAudioRoute = ApiPublicQuranAudioRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/surahs': typeof SurahsRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/surahs': typeof SurahsRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/favorites': typeof FavoritesRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/surahs': typeof SurahsRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/favorites'
+    | '/privacy'
     | '/search'
     | '/settings'
     | '/surahs'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/favorites'
+    | '/privacy'
     | '/search'
     | '/settings'
     | '/surahs'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/favorites'
+    | '/privacy'
     | '/search'
     | '/settings'
     | '/surahs'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FavoritesRoute: typeof FavoritesRoute
+  PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   SurahsRoute: typeof SurahsRoute
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/favorites'
       fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FavoritesRoute: FavoritesRoute,
+  PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   SurahsRoute: SurahsRoute,
