@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BookOpen, Headphones } from "lucide-react";
 import { useT } from "@/lib/i18n";
-import { setState, useStore } from "@/lib/store";
+import { favoritesOf, useStore } from "@/lib/store";
+import { useDownloadedSurahs } from "@/lib/downloads";
 import { RECITERS, SURAHS, surah } from "@/lib/quran";
 import { SurahRow } from "@/components/AppShell";
 import { ReciterPicker } from "@/components/LibraryControls";
@@ -27,6 +28,13 @@ function Home() {
   const listen = useStore((s) => s.lastListen);
   const opened = useStore((s) => s.stats.surahsOpened.length);
   const reciter = useStore((s) => s.reciter);
+  const favs = useStore((s) => favoritesOf(s, reciter));
+  const downloads = useDownloadedSurahs(lang, reciter);
+  const [filter, setFilter] = useState<"all" | "favorites" | "offline">("all");
+  const listRef = useRef<HTMLDivElement>(null);
+  const r = RECITERS.find((x) => x.id === reciter);
+  const reciterName = r ? (lang === "ar" ? r.ar : r.name) : "";
+  const list = filter === "all" ? SURAHS.map((s) => s.n) : [...new Set(filter === "favorites" ? favs : downloads)].sort((a, b) => a - b);
   const [date, setDate] = useState<{ g: string; h: string; morning: boolean } | null>(null);
   useEffect(() => {
     const d = new Date();
@@ -59,13 +67,23 @@ function Home() {
       )}
 
       <h2 className="px-6 pb-2 pt-8 text-2xl font-semibold">{t("reciters")}</h2>
-      <div className="px-5 pb-2"><ReciterPicker /></div>
+      <div className="px-5 pb-2"><ReciterPicker onSelect={() => listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} /></div>
 
-      <div className="flex items-end justify-between px-6 pb-2 pt-8">
-        <h2 className="text-2xl font-semibold">{t("surahs")}</h2>
-        <Link to="/surahs" className="text-sm font-medium text-primary">{num(114)} →</Link>
+      <div ref={listRef} className="scroll-mt-4 px-6 pb-2 pt-8">
+        <h2 className="text-2xl font-semibold">{t("surahsOf")} {reciterName}</h2>
+        <div role="tablist" className="mt-3 flex gap-2">
+          {(["all", "favorites", "offline"] as const).map((k) => (
+            <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)}
+              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${filter === k ? "border-primary bg-primary text-primary-foreground" : "bg-card text-muted-foreground"}`}>
+              {t(k === "offline" ? "offlineAvailable" : k)} · {num(k === "all" ? 114 : k === "favorites" ? favs.length : downloads.length)}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="px-1">{SURAHS.slice(0, 8).map((s) => <SurahRow key={s.n} n={s.n} />)}</div>
+      <div className="px-1">
+        {list.map((n) => <SurahRow key={n} n={n} />)}
+        {!list.length && <p className="p-8 text-center text-muted-foreground">{t("noResults")}</p>}
+      </div>
     </div>
   );
 }
