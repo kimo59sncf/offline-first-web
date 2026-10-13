@@ -110,3 +110,24 @@ describe("favorites without duplicates", () => {
     expect(favoriteSurahsOf(clean, "ar.alafasy")).toEqual([2, 5]);
   });
 });
+
+import { togglePlaylist, playlistReciter } from "@/lib/store";
+import { playlistStart } from "@/lib/playback";
+describe("personal playlist", () => {
+  it("remembers the reciter chosen for each surah", () => {
+    let s = { ...baseState, reciter: "ar.husary" };
+    s = { ...s, ...togglePlaylist(s, 2, "ar.husary") };
+    s = { ...s, reciter: "ar.alafasy", ...togglePlaylist({ ...s, reciter: "ar.alafasy" }, 18, "ar.alafasy") };
+    expect(playlistReciter(s, 2)).toBe("ar.husary");
+    expect(playlistReciter(s, 18)).toBe("ar.alafasy");
+    s = { ...s, ...togglePlaylist(s, 2, "ar.alafasy") }; // re-assign, no duplicate
+    expect(s.playlist).toEqual([2, 18]);
+    expect(playlistReciter(s, 2)).toBe("ar.alafasy");
+  });
+  it("shuffle never repeats the current surah and starts randomly", () => {
+    expect(followingSurah(2, [2, 18, 36], false, true, () => 0)).toBe(18);
+    expect(followingSurah(2, [2, 18, 36], false, true, () => 0.99)).toBe(36);
+    expect(playlistStart([2, 18, 36], true, () => 0.99)).toBe(36);
+    expect(playlistStart([2, 18, 36], false)).toBe(2);
+  });
+});

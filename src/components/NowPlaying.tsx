@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, ListMusic, Pause, Play, Repeat, RotateCcw, RotateCw, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
+import { ChevronsRight, ChevronDown, Pause, Play, Repeat, RotateCcw, RotateCw, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SurahActions } from "@/components/LibraryControls";
 import { ReciterPortrait } from "@/components/ReciterPortrait";
@@ -8,12 +8,13 @@ import { useT } from "@/lib/i18n";
 import { usePlayer } from "@/lib/player-context";
 import { RECITERS, surah, surahName } from "@/lib/quran";
 import { RECITER_PHOTOS } from "@/lib/reciter-photos";
-import { useStore } from "@/lib/store";
+import { setState, useStore } from "@/lib/store";
 
 function useNowPlaying() {
   const p = usePlayer();
   const { lang } = useT();
-  const reciterId = useStore((s) => s.reciter);
+  const selected = useStore((s) => s.reciter);
+  const reciterId = p.reciter ?? selected;
   const tr = p.queue[p.index];
   const r = RECITERS.find((x) => x.id === reciterId);
   return { p, tr, reciterId, photo: RECITER_PHOTOS[reciterId], reciterName: (lang === "ar" ? r?.ar : r?.name) ?? reciterId };
@@ -50,6 +51,7 @@ export function MiniPlayer() {
             {p.error ? <RotateCw className="h-5 w-5" /> : p.playing ? <Pause className="h-5 w-5" fill="currentColor" /> : <Play className="h-5 w-5 translate-x-px" fill="currentColor" />}
           </button>
           <Button size="icon" variant="ghost" aria-label={t("next")} onClick={p.next}><SkipForward className="rtl:rotate-180" /></Button>
+          <Button size="icon" variant="ghost" aria-label={t("nextSurah")} title={t("nextSurah")} onClick={p.nextSurah}><ChevronsRight className="rtl:rotate-180" /></Button>
           <Button size="icon" variant="ghost" aria-label={t("close")} onClick={p.stop} className="hidden sm:inline-flex"><X /></Button>
         </div>
         <div className="relative h-1 bg-foreground/10"><div className="h-full bg-gold transition-[width]" style={{ width: `${p.progress * 100}%` }} /></div>
@@ -68,7 +70,7 @@ function FullPlayer({ onClose }: { onClose: () => void }) {
     document.body.style.overflow = "hidden";
     return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
   }, [onClose]);
-  const playlistCount = useStore((s) => s.playlist.length);
+  const shuffle = useStore((s) => s.playlistShuffle);
   const dl = useDownload(tr?.s ?? 1, lang, reciterId);
   const fav = useStore((st) => (st.favoriteSurahs[reciterId] ?? []).includes(tr?.s ?? 0));
   if (!tr) return null;
@@ -120,8 +122,8 @@ function FullPlayer({ onClose }: { onClose: () => void }) {
       <div className="mt-8 flex items-center justify-between rounded-2xl border bg-card/60 p-2 backdrop-blur">
         <Button variant="ghost" size="sm" aria-label={t("speed")} onClick={() => p.setSpeed(speeds[(speeds.indexOf(p.speed) + 1) % speeds.length] ?? 1)} className="font-semibold">{p.speed}×</Button>
         <Button variant="ghost" size="icon" aria-label={`${t("repeat")}: ${repeatLabel}`} title={repeatLabel} aria-pressed={p.repeat !== "off"} className={p.repeat !== "off" ? "text-gold" : ""} onClick={() => p.setRepeat(order[(order.indexOf(p.repeat) + 1) % 3] ?? "off")}><Repeat /></Button>
-        <Button variant="ghost" size="icon" aria-label={t("shuffle")} onClick={() => void p.playRandomSurah()}><Shuffle /></Button>
-        <Button variant="ghost" size="icon" aria-label={t("nextSurah")} disabled={tr.s === 114 && !playlistCount} onClick={p.nextSurah}><ListMusic /></Button>
+        <Button variant="ghost" size="icon" aria-label={t("shufflePlaylist")} title={t("shufflePlaylist")} aria-pressed={shuffle} className={shuffle ? "text-gold" : ""} onClick={() => setState((s) => ({ playlistShuffle: !s.playlistShuffle }))}><Shuffle /></Button>
+        <Button variant="ghost" size="icon" aria-label={t("nextSurah")} title={t("nextSurah")} onClick={p.nextSurah}><ChevronsRight className="rtl:rotate-180" /></Button>
       </div>
     </div>
   </div>;

@@ -11,7 +11,7 @@ import { ReciterPortrait } from "@/components/ReciterPortrait";
 export function SurahActions({ n, favorite, saved, busy }: { n: number; favorite: boolean; saved: boolean; busy: boolean }) {
   const { t, lang } = useT();
   const reciter = useStore((s) => s.reciter);
-  const inPlaylist = useStore((s) => s.playlist.includes(n) && s.playlistReciters?.[n] === reciter);
+  const inPlaylist = useStore((s) => s.playlist.includes(n) && (s.playlistReciters?.[n] ?? reciter) === reciter);
   const downloadLabel = t(busy ? "saving" : saved ? "removeDownload" : "download");
   return <div className="flex shrink-0 items-center">
     <Button size="icon" variant="ghost" title={downloadLabel} aria-label={downloadLabel} aria-pressed={saved} disabled={busy}
