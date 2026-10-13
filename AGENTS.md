@@ -21,3 +21,4 @@
 - Native apps use Capacitor with a separate static SPA build (vite.mobile.config.ts → dist-mobile); vite.config.ts stays the web/SSR build. Why: Capacitor needs embedded files while the website keeps SSR.
 - Server routes called from the native app use apiOrigin() (VITE_PUBLIC_API_ORIGIN, native only) and allow only Capacitor origins via CORS. Why: the native WebView is not same-origin with the published server.
 - Native-only behavior (back button, status bar, splash, external links) lives in src/lib/native.ts behind isNativeApp() with dynamic plugin imports. Why: keep the web bundle and SSR untouched.
+- The full-screen player and mini-player live in src/components/NowPlaying.tsx, separate from AppShell. Why: keep the shell lean and the player UI self-contained.

@@ -17,10 +17,10 @@
 - [ ] 15 Final audit
 
 ## Demandes en cours
-- [ ] Accueil : 114 sourates, liste par récitateur (toutes / favoris / hors ligne)
-- [ ] Favoris : sections distinctes hors ligne / favoris / playlist, sans doublons
-- [ ] Récupérer la dernière version GitHub (kimo59sncf/coran-pro-setup, branche mobile)
-- [ ] Playlist sur l'accueil
-- [ ] Lecteur plein écran + mini-player : fond dégradé avec image du récitateur (palette émeraude/or/nuit)
-- [ ] Ajouter le récitateur Ahmed Khedr
-- [ ] Moderniser le visuel (Cormorant Garamond + Karla)
+- [x] Accueil : 114 sourates, liste par récitateur (toutes / favoris / hors ligne)
+- [x] Favoris : sections distinctes hors ligne / favoris / playlist, sans doublons
+- [x] Récupérer la dernière version GitHub (kimo59sncf/coran-pro-setup, branche mobile)
+- [x] Playlist sur l'accueil
+- [x] Lecteur plein écran + mini-player : fond dégradé avec image du récitateur (palette émeraude/or/nuit)
+- [ ] Ajouter le récitateur Ahmed Khedr — bloqué : aucune source audio verset par verset vérifiée
+- [x] Moderniser le visuel (Cormorant Garamond + Karla)

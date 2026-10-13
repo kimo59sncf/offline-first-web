@@ -98,3 +98,15 @@ describe("Offline downloads", () => {
     expect(await isDownloaded(1, "fr", "ar.alafasy")).toBe(false);
   });
 });
+import { dedupe, defaultState as baseState, toggleFavoriteSurah, favoriteSurahsOf } from "@/lib/store";
+describe("favorites without duplicates", () => {
+  it("keeps favorites per reciter and removes duplicates", () => {
+    let s = { ...baseState, ...toggleFavoriteSurah(baseState, "ar.alafasy", 2) };
+    s = { ...s, ...toggleFavoriteSurah(s, "ar.husary", 3) };
+    expect(favoriteSurahsOf(s, "ar.alafasy")).toEqual([2]);
+    expect(favoriteSurahsOf(s, "ar.husary")).toEqual([3]);
+    const clean = dedupe({ ...s, playlist: [1, 1, 2], favoriteSurahs: { "ar.alafasy": [2, 2, 5] } });
+    expect(clean.playlist).toEqual([1, 2]);
+    expect(favoriteSurahsOf(clean, "ar.alafasy")).toEqual([2, 5]);
+  });
+});
