@@ -47,7 +47,7 @@ function Favorites() {
       <Section icon={<Heart className="h-5 w-5 text-favorite" fill="currentColor" />} title={t("favoriteSurahs")} count={num(favoriteSurahs.length)} list={favoriteSurahs} empty={t("noResults")} />
       <Section icon={<CloudCheck className="h-5 w-5 text-success" fill="currentColor" />} title={t("offlineAvailable")} count={num(downloads.length)} list={downloads} empty={t("noResults")} />
       <Section icon={<ListMusic className="h-5 w-5 text-gold" />} title={t("playlist")} count={num(playlist.length)} list={playlist} empty={t("emptyPlaylist")}
-        action={<Button variant="outline" size="sm" disabled={!playlist.length} onClick={() => { const n = playlist[0]; if (n) void player.playSurah(n); }}><Play />{t("playPlaylist")}</Button>} />
+        action={<Button variant="outline" size="sm" disabled={!playlist.length} onClick={() => player.playPlaylist()}><Play />{t("playPlaylist")}</Button>} />
       <section className="mb-6 px-5"><h2 className="pb-3 text-xl font-semibold">{t("favoriteReciters")}</h2><ReciterPicker favoritesOnly />{!favoriteReciters.length && <p className="text-sm text-muted-foreground">{t("noResults")}</p>}</section>
       <h2 className="px-5 pb-2 text-xl font-semibold">{t("ayahs")}</h2>
       {!items.length ? (

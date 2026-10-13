@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { getState, setState } from "./store";
+import { getState, playlistReciter, setState } from "./store";
 import { cachedAudioUrl, surahTracks } from "./downloads";
-import { followingSurah, randomSurah } from "./playback";
+import { playlistStart, followingSurah, randomSurah } from "./playback";
 import { PlayerCtx, type PlayerContextValue, type Track, type Repeat } from "./player-context";
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
@@ -13,6 +13,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [speed, setSpeed] = useState(1);
   const [repeat, setRepeat] = useState<Repeat>("off");
   const [progress, setProgress] = useState(0);
+  const [reciter, setReciter] = useState<string | null>(null);
   const request = useRef(0);
   const blobUrl = useRef<string | null>(null);
   const st = useRef({ queue, index, repeat, speed });
@@ -31,8 +32,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       if (index + 1 < queue.length) { void load(index + 1, queue); return; }
       if (repeat === "surah") { void load(0, queue); return; }
       const preferences = getState();
-      const next = followingSurah(queue[index]?.s ?? 114, preferences.playlist, preferences.autoAdvance);
-      if (next) { void playSurah(next); return; }
+      const next = followingSurah(queue[index]?.s ?? 114, preferences.playlist, preferences.autoAdvance, preferences.playlistShuffle);
+      if (next) { void playNext(next); return; }
       setPlaying(false);
     };
     return () => { request.current++; el.pause(); if (blobUrl.current) URL.revokeObjectURL(blobUrl.current); };
@@ -62,14 +63,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function playSurah(n: number) {
+  /** Playlist surahs keep the reciter chosen when they were added. */
+  function playNext(n: number) {
+    const s = getState();
+    return playSurah(n, s.playlist.includes(n) ? playlistReciter(s, n) : undefined);
+  }
+
+  async function playSurah(n: number, withReciter?: string) {
     const id = ++request.current;
     audio.current?.pause(); setError(false);
     const preferences = getState();
+    const r = withReciter ?? preferences.reciter;
     try {
-      const tracks = await surahTracks(n, preferences.lang, preferences.reciter);
+      const tracks = await surahTracks(n, preferences.lang, r);
       if (id !== request.current) return;
-      setQueue(tracks); await load(0, tracks);
+      setReciter(r); setQueue(tracks); await load(0, tracks);
     } catch { if (id === request.current) { setError(true); setPlaying(false); } }
   }
 
@@ -81,12 +89,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const value: PlayerContextValue = {
     queue, index, playing, error, speed, repeat, progress,
-    playSurah,
+    playSurah, reciter,
     playRandomSurah,
+    playPlaylist: () => { const s = getState(); const n = playlistStart(s.playlist, s.playlistShuffle); if (n) void playNext(n); },
     nextSurah: () => {
       const preferences = getState();
-      const n = followingSurah(queue[index]?.s ?? 114, preferences.playlist, true);
-      if (n) void playSurah(n);
+      const n = followingSurah(queue[index]?.s ?? 114, preferences.playlist, true, preferences.playlistShuffle);
+      if (n) void playNext(n);
     },
     playQueue: (q, start) => { setQueue(q); load(start, q); },
     toggle: () => {

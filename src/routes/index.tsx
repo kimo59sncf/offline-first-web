@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, Headphones, ListMusic, Play, Shuffle } from "lucide-react";
 import { useT } from "@/lib/i18n";
-import { favoriteSurahsOf, useStore } from "@/lib/store";
+import { favoriteSurahsOf, setState, useStore } from "@/lib/store";
 import { useDownloadedSurahs } from "@/lib/downloads";
 import { RECITERS, SURAHS, surah, surahName } from "@/lib/quran";
 import { SurahRow } from "@/components/AppShell";
@@ -32,6 +32,8 @@ function Home() {
   const player = usePlayer();
   const favs = useStore((s) => favoriteSurahsOf(s, reciter));
   const playlist = useStore((s) => s.playlist);
+  const playlistReciters = useStore((s) => s.playlistReciters);
+  const shuffle = useStore((s) => s.playlistShuffle);
   const downloads = useDownloadedSurahs(lang, reciter);
   const [filter, setFilter] = useState<"all" | "favorites" | "offline">("all");
   const listRef = useRef<HTMLDivElement>(null);
@@ -81,7 +83,9 @@ function Home() {
         <div className="flex items-center gap-3 px-5 pb-3 pt-5">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/20 text-primary"><ListMusic className="h-5 w-5" /></span>
           <h2 className="flex-1 text-2xl font-semibold">{t("myPlaylist")}</h2>
-          <button disabled={!playlist.length} onClick={() => { const n = playlist[0]; if (n) void player.playSurah(n); }}
+          <button aria-label={t("shufflePlaylist")} title={t("shufflePlaylist")} aria-pressed={shuffle} onClick={() => setState((s) => ({ playlistShuffle: !s.playlistShuffle }))}
+            className={`grid h-10 w-10 place-items-center rounded-full border transition-colors ${shuffle ? "border-gold text-gold" : "text-muted-foreground"}`}><Shuffle className="h-4 w-4" /></button>
+          <button disabled={!playlist.length} onClick={() => player.playPlaylist()}
             aria-label={t("playPlaylist")} className="grid h-11 w-11 place-items-center rounded-full bg-gold text-gold-foreground shadow-gold transition-transform active:scale-95 disabled:opacity-40">
             <Play className="h-5 w-5 translate-x-px" fill="currentColor" />
           </button>
@@ -89,11 +93,11 @@ function Home() {
         {playlist.length ? (
           <div className="no-scrollbar flex gap-3 overflow-x-auto px-5 pb-5">
             {playlist.map((n, i) => (
-              <button key={n} onClick={() => void player.playSurah(n)} className="bg-hero relative flex h-28 w-36 shrink-0 flex-col justify-end rounded-2xl border border-gold/20 p-3 text-start transition-transform active:scale-95">
+              <button key={n} onClick={() => void player.playSurah(n, playlistReciters[n] ?? reciter)} className="bg-hero relative flex h-32 w-40 shrink-0 flex-col justify-end rounded-2xl border border-gold/20 p-3 text-start transition-transform active:scale-95">
                 <span className="absolute start-3 top-3 text-xs font-semibold text-gold">{num(i + 1)}</span>
                 <span dir="rtl" className="font-quran absolute end-3 top-2 text-lg text-gold/80">{surah(n).ar.replace("سُورَةُ ", "")}</span>
                 <span className="truncate font-semibold">{surahName(surah(n), lang)}</span>
-                <span className="text-xs text-muted-foreground">{num(surah(n).ayahs)} {t("ayahs")}</span>
+                <span className="truncate text-xs text-muted-foreground">{(() => { const pr = RECITERS.find((x) => x.id === (playlistReciters[n] ?? reciter)); return pr ? (lang === "ar" ? pr.ar : pr.name) : ""; })()}</span>
               </button>
             ))}
           </div>
