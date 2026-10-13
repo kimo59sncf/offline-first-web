@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { BookOpen, Headphones, Shuffle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { BookOpen, Headphones, ListMusic, Play, Shuffle } from "lucide-react";
 import { useT } from "@/lib/i18n";
-import { setState, useStore } from "@/lib/store";
+import { favoriteSurahsOf, useStore } from "@/lib/store";
+import { useDownloadedSurahs } from "@/lib/downloads";
 import { RECITERS, SURAHS, surah, surahName } from "@/lib/quran";
 import { SurahRow } from "@/components/AppShell";
 import { ReciterPicker } from "@/components/LibraryControls";
@@ -29,6 +30,14 @@ function Home() {
   const opened = useStore((s) => s.stats.surahsOpened.length);
   const reciter = useStore((s) => s.reciter);
   const player = usePlayer();
+  const favs = useStore((s) => favoriteSurahsOf(s, reciter));
+  const playlist = useStore((s) => s.playlist);
+  const downloads = useDownloadedSurahs(lang, reciter);
+  const [filter, setFilter] = useState<"all" | "favorites" | "offline">("all");
+  const listRef = useRef<HTMLDivElement>(null);
+  const r = RECITERS.find((x) => x.id === reciter);
+  const reciterName = r ? (lang === "ar" ? r.ar : r.name) : "";
+  const list = filter === "all" ? SURAHS.map((s) => s.n) : [...new Set(filter === "favorites" ? favs : downloads)].sort((a, b) => a - b);
   const [date, setDate] = useState<{ g: string; h: string; morning: boolean } | null>(null);
   useEffect(() => {
     const d = new Date();
@@ -68,14 +77,47 @@ function Home() {
         </p>
       )}
 
-      <h2 className="px-6 pb-2 pt-8 text-2xl font-semibold">{t("reciters")}</h2>
-      <div className="px-5 pb-2"><ReciterPicker /></div>
+      <section className="mx-3 mt-6 overflow-hidden rounded-3xl border bg-card shadow-soft">
+        <div className="flex items-center gap-3 px-5 pb-3 pt-5">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/20 text-primary"><ListMusic className="h-5 w-5" /></span>
+          <h2 className="flex-1 text-2xl font-semibold">{t("myPlaylist")}</h2>
+          <button disabled={!playlist.length} onClick={() => { const n = playlist[0]; if (n) void player.playSurah(n); }}
+            aria-label={t("playPlaylist")} className="grid h-11 w-11 place-items-center rounded-full bg-gold text-gold-foreground shadow-gold transition-transform active:scale-95 disabled:opacity-40">
+            <Play className="h-5 w-5 translate-x-px" fill="currentColor" />
+          </button>
+        </div>
+        {playlist.length ? (
+          <div className="no-scrollbar flex gap-3 overflow-x-auto px-5 pb-5">
+            {playlist.map((n, i) => (
+              <button key={n} onClick={() => void player.playSurah(n)} className="bg-hero relative flex h-28 w-36 shrink-0 flex-col justify-end rounded-2xl border border-gold/20 p-3 text-start transition-transform active:scale-95">
+                <span className="absolute start-3 top-3 text-xs font-semibold text-gold">{num(i + 1)}</span>
+                <span dir="rtl" className="font-quran absolute end-3 top-2 text-lg text-gold/80">{surah(n).ar.replace("سُورَةُ ", "")}</span>
+                <span className="truncate font-semibold">{surahName(surah(n), lang)}</span>
+                <span className="text-xs text-muted-foreground">{num(surah(n).ayahs)} {t("ayahs")}</span>
+              </button>
+            ))}
+          </div>
+        ) : <p className="px-5 pb-5 text-sm text-muted-foreground">{t("emptyPlaylist")}</p>}
+      </section>
 
-      <div className="flex items-end justify-between px-6 pb-2 pt-8">
-        <h2 className="text-2xl font-semibold">{t("surahs")}</h2>
-        <Link to="/surahs" className="text-sm font-medium text-primary">{num(114)} →</Link>
+      <h2 className="px-6 pb-2 pt-8 text-2xl font-semibold">{t("reciters")}</h2>
+      <div className="px-5 pb-2"><ReciterPicker onSelect={() => listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} /></div>
+
+      <div ref={listRef} className="scroll-mt-4 px-6 pb-2 pt-6">
+        <h2 className="text-2xl font-semibold">{t("surahsOf")} <span className="text-gold">{reciterName}</span></h2>
+        <div role="tablist" className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
+          {(["all", "favorites", "offline"] as const).map((k) => (
+            <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)}
+              className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${filter === k ? "border-gold bg-gold text-gold-foreground" : "bg-card text-muted-foreground"}`}>
+              {t(k === "offline" ? "offlineAvailable" : k)} · {num(k === "all" ? 114 : k === "favorites" ? favs.length : downloads.length)}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="px-1">{SURAHS.map((s) => <SurahRow key={s.n} n={s.n} />)}</div>
+      <div className="px-1">
+        {list.map((n) => <SurahRow key={n} n={n} />)}
+        {!list.length && <p className="p-8 text-center text-muted-foreground">{t("noResults")}</p>}
+      </div>
     </div>
   );
 }
