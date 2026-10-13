@@ -2,7 +2,7 @@ import { CloudDownload, CloudCheck, Heart, ListPlus, ListChecks, LoaderCircle } 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
-import { setState, toggleFavoriteSurah, toggleIn, toggleSurah, useStore } from "@/lib/store";
+import { setState, togglePlaylist, toggleFavoriteSurah, toggleIn, toggleSurah, useStore } from "@/lib/store";
 import { downloadSurah, removeDownload } from "@/lib/downloads";
 import { RECITERS } from "@/lib/quran";
 import { RECITER_PHOTOS } from "@/lib/reciter-photos";
@@ -11,7 +11,7 @@ import { ReciterPortrait } from "@/components/ReciterPortrait";
 export function SurahActions({ n, favorite, saved, busy }: { n: number; favorite: boolean; saved: boolean; busy: boolean }) {
   const { t, lang } = useT();
   const reciter = useStore((s) => s.reciter);
-  const inPlaylist = useStore((s) => s.playlist.includes(n));
+  const inPlaylist = useStore((s) => s.playlist.includes(n) && s.playlistReciters?.[n] === reciter);
   const downloadLabel = t(busy ? "saving" : saved ? "removeDownload" : "download");
   return <div className="flex shrink-0 items-center">
     <Button size="icon" variant="ghost" title={downloadLabel} aria-label={downloadLabel} aria-pressed={saved} disabled={busy}
@@ -24,7 +24,7 @@ export function SurahActions({ n, favorite, saved, busy }: { n: number; favorite
       <Heart fill={favorite ? "currentColor" : "none"} />
     </Button>
     <Button size="icon" variant="ghost" title={t(inPlaylist ? "removePlaylist" : "addPlaylist")} aria-label={t(inPlaylist ? "removePlaylist" : "addPlaylist")} aria-pressed={inPlaylist}
-      className={inPlaylist ? "text-primary" : "text-muted-foreground"} onClick={() => setState((s) => ({ playlist: toggleSurah(s.playlist, n) }))}>
+      className={inPlaylist ? "text-primary" : "text-muted-foreground"} onClick={() => setState((s) => togglePlaylist(s, n, reciter))}>
       {inPlaylist ? <ListChecks /> : <ListPlus />}
     </Button>
   </div>;

@@ -11,6 +11,8 @@ export type AppState = {
   favoriteSurahs: Record<string, number[]>; // surah favorites per reciter id
   favoriteReciters: string[];
   playlist: number[];
+  playlistReciters: Record<string, string>; // surah -> reciter chosen when added
+  playlistShuffle: boolean;
   autoAdvance: boolean;
   bookmarks: string[];
   lastRead: { s: number; a: number } | null;
@@ -30,6 +32,8 @@ export const defaultState: AppState = {
   favoriteSurahs: {},
   favoriteReciters: [],
   playlist: [],
+  playlistReciters: {},
+  playlistShuffle: false,
   autoAdvance: true,
   bookmarks: [],
   lastRead: null,
@@ -110,3 +114,13 @@ export function dedupe(s: AppState): AppState {
   for (const [k, v] of Object.entries(s.favoriteSurahs ?? {})) fav[k] = uniq(v);
   return { ...s, favoriteSurahs: fav, favorites: uniq(s.favorites), bookmarks: uniq(s.bookmarks), favoriteReciters: uniq(s.favoriteReciters), playlist: uniq(s.playlist) };
 }
+
+/** Adds the surah to the playlist with this reciter, re-assigns it, or removes it when already set to this reciter. */
+export function togglePlaylist(s: AppState, n: number, reciter: string): Partial<AppState> {
+  const map = { ...(s.playlistReciters ?? {}) };
+  const inList = s.playlist.includes(n);
+  if (inList && map[n] === reciter) { delete map[n]; return { playlist: s.playlist.filter((x) => x !== n), playlistReciters: map }; }
+  map[n] = reciter;
+  return { playlist: inList ? s.playlist : [...s.playlist, n], playlistReciters: map };
+}
+export const playlistReciter = (s: AppState, n: number) => s.playlistReciters?.[n] ?? s.reciter;

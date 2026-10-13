@@ -8,7 +8,9 @@ export type PlayerContextValue = {
   playQueue: (q: Track[], start: number) => void;
   toggle: () => void; next: () => void; prev: () => void;
   nextSurah: () => void;
-  playSurah: (n: number) => Promise<void>;
+  playSurah: (n: number, reciter?: string) => Promise<void>;
+  playPlaylist: () => void;
+  reciter: string | null;
   playRandomSurah: () => Promise<void>;
   seek: (delta: number) => void; setSpeed: (n: number) => void; setRepeat: (r: Repeat) => void; stop: () => void;
 };
