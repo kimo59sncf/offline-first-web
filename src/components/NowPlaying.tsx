@@ -20,7 +20,7 @@ function useNowPlaying() {
 }
 
 /** Blurred reciter portrait behind a deep emerald gradient. */
-function Backdrop({ photo }: { photo?: string }) {
+function Backdrop({ photo }: { photo: string | undefined }) {
   return <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
     {photo && <img src={photo} alt="" className="absolute inset-0 h-full w-full scale-125 object-cover opacity-60 blur-2xl" />}
     <div className="bg-player absolute inset-0" />
@@ -69,7 +69,8 @@ function FullPlayer({ onClose }: { onClose: () => void }) {
     return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
   }, [onClose]);
   const playlistCount = useStore((s) => s.playlist.length);
-  useDownload(tr?.s ?? 1, lang, reciterId);
+  const dl = useDownload(tr?.s ?? 1, lang, reciterId);
+  const fav = useStore((st) => (st.favoriteSurahs[reciterId] ?? []).includes(tr?.s ?? 0));
   if (!tr) return null;
   const s = surah(tr.s);
   const order = ["off", "ayah", "surah"] as const;
@@ -98,7 +99,7 @@ function FullPlayer({ onClose }: { onClose: () => void }) {
           <h2 className="truncate text-3xl font-semibold">{surahName(s, lang)}</h2>
           <p className="truncate text-muted-foreground">{reciterName}</p>
         </div>
-        <SurahActions n={tr.s} />
+        <SurahActions n={tr.s} favorite={fav} saved={dl.saved} busy={dl.busy} />
       </div>
 
       <div className="mt-6">
